@@ -1,5 +1,5 @@
 const config = {
-  opacityDecay: 0.01, // rate of opacity decay
+  opacityDecay: 0.02, // rate of opacity decay
   skyColor: {
     h: 242,
     s: 100,

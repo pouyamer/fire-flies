@@ -6,5 +6,4 @@ Lovely Fireflies that flicker in the sky.
 
 You can edit the `config.js` file to your liking.
 
-Codepen:
-https://codepen.io/pouyamer/pen/RwQOwye
+You can view the project on [CodePen](https://codepen.io/pouyamer/pen/RwQOwye).

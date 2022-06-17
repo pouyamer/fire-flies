@@ -5,7 +5,10 @@ class FireFly {
     this.size = size
     // color is an object with hsla values
     this.color = color
-    this.direction = Math.random() > 0.5 ? 1 : -1
+    // X and Y Direction is a number between -1 and 1
+    // -1 is left, 1 is right
+    this.xDirection = Math.random() > 0.5 ? 1 : -1
+    this.yDirection = Math.random() > 0.5 ? 1 : -1
     this.opacity = Math.random() * 0.5 + 0.5
   }
 
@@ -31,8 +34,8 @@ class FireFly {
   }
 
   update() {
-    this.x += Math.random() * this.direction
-    this.y += Math.random() * this.direction
+    this.x += Math.random() * this.xDirection
+    this.y += Math.random() * this.yDirection
     this.draw()
     this.liveAndDie()
   }

@@ -1,5 +1,5 @@
 const config = {
-  opacityDecay: 0.02, // rate of opacity decay
+  opacityDecay: 0.01, // rate of opacity decay
   skyColor: {
     h: 242,
     s: 100,
@@ -7,7 +7,7 @@ const config = {
     a: 1
   },
   fireflies: {
-    number: 100, // Number of fireflies
+    number: 200, // Number of fireflies
     size: {
       min: 4,
       max: 12

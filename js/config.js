@@ -10,13 +10,13 @@ const config = {
   },
   fireflies: {
     speed: {
-      min: 0.1,
-      max: 2
+      min: 1,
+      max: 3
     },
     number: 100, // Number of fireflies
     size: {
-      min: 2,
-      max: 7
+      min: 1,
+      max: 5
     },
     color: {
       h: 60,

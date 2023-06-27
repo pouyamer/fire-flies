@@ -16,12 +16,18 @@ class FireFly {
   }
 
   // Determine the direction of the firefly (X-wise or Y-wise)
+  // For X, -1:left, 1:right
+  // For Y: -1:up, 1:down
+  // For X and Y: 0:not moving in that direction
+
   determineDirection = () => {
     const direction = Math.random()
     if (direction < 0.44) return -1
     if (direction < 0.88) return 1
     if (direction < 1) return 0
   }
+  // if X is not moving Y should move, so it doesn't stay still and die sadly :(
+  determineDirectionIfXisNotMoving = () => (Math.random() < 0.5 ? 1 : -1)
 
   draw = () => {
     ctx.beginPath()
@@ -44,7 +50,12 @@ class FireFly {
       this.x = Math.random() * canvasSize.width
       this.y = Math.random() * canvasSize.height
       this.xDirection = this.determineDirection()
-      this.yDirection = this.determineDirection()
+
+      this.yDirection =
+        this.xDirection === 0
+          ? this.determineDirectionIfXisNotMoving()
+          : this.determineDirection()
+
       this.opacity = Math.random() * 0.5 + 0.5
     }
   }

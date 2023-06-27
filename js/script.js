@@ -19,7 +19,7 @@ for (let i = 0; i < config.fireflies.number; i++) {
       Math.random() * canvasSize.height,
       Math.random() * (max - min) + min,
       {
-        h: config.fireflies.color.h,
+        h: config.rainbowMode ? Math.random() * 360 : config.fireflies.color.h,
         s: config.fireflies.color.s,
         l: config.fireflies.color.l,
         a: config.fireflies.color.a
@@ -32,6 +32,8 @@ for (let i = 0; i < config.fireflies.number; i++) {
 
 const render = () => {
   // Sky
+  ctx.clearRect(0, 0, canvasSize.width, canvasSize.height)
+
   ctx.fillStyle = hslStringify(
     config.skyColor.h,
     config.skyColor.s,

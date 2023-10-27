@@ -1,18 +1,33 @@
 class FireFly {
-  constructor(x, y, size, color, speed, rainbowMode) {
+  constructor(x, y, config) {
     this.x = x
     this.y = y
-    this.size = size
+    this.config = config
+    this.canvasSize = this.config.canvasSize
+    this.rainbowMode = this.config.rainbowMode
+
+    // size gets randomized based on your config
+    const { min, max } = this.config.fireflies.size
+    this.size = Math.random() * (max - min) + min
+
     // color is an object with hsla values
-    this.color = color
+    this.color = {
+      h: this.config.rainbowMode
+        ? Math.random() * 360
+        : this.config.fireflies.color.h,
+      s: this.config.fireflies.color.s,
+      l: this.config.fireflies.color.l,
+      a: this.config.fireflies.color.a
+    }
     // X and Y Direction is a number between -1 and 1
     // -1 is left or up, 1 is right or down, 0 is stationary in that axis
     this.xDirection = this.determineDirection()
     this.yDirection = this.determineDirection()
 
     this.opacity = Math.random() * 0.5 + 0.5
-    this.speed = speed
-    this.rainbowMode = rainbowMode
+
+    const { min: minSpeed, max: maxSpeed } = this.config.fireflies.speed
+    this.speed = Math.random() * (maxSpeed - minSpeed) + minSpeed
   }
 
   // Determine the direction of the firefly (X-wise or Y-wise)
@@ -29,7 +44,7 @@ class FireFly {
   // if X is not moving Y should move, so it doesn't stay still and die sadly :(
   determineDirectionIfXisNotMoving = () => (Math.random() < 0.5 ? 1 : -1)
 
-  draw = () => {
+  draw = ctx => {
     ctx.beginPath()
     ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI)
     ctx.fillStyle = hslStringify(
@@ -45,10 +60,10 @@ class FireFly {
   // if it reaches 0, it is moved to a random location
   // and its opacity is reset to a random value (> 0.5)
   liveAndDie = () => {
-    this.opacity -= config.opacityDecay
+    this.opacity -= this.config.opacityDecay
     if (this.opacity < 0) {
-      this.x = Math.random() * canvasSize.width
-      this.y = Math.random() * canvasSize.height
+      this.x = Math.random() * this.canvasSize.width
+      this.y = Math.random() * this.canvasSize.height
       this.xDirection = this.determineDirection()
 
       this.yDirection =
@@ -66,10 +81,10 @@ class FireFly {
     }
   }
 
-  update() {
+  update(ctx) {
     this.x += this.speed * Math.random() * this.xDirection
     this.y += this.speed * Math.random() * this.yDirection
-    this.draw()
+    this.draw(ctx)
     this.liveAndDie()
     this.somewhereOverTheRainbow()
   }

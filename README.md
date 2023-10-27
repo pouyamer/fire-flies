@@ -1,9 +1,18 @@
 # Fireflies
-
+A beautiful fireflies simulation made using Canvas API.
 https://user-images.githubusercontent.com/20505286/174344109-2368b8e9-c9c1-4844-a19b-807e33cd1ca5.mp4
 
 Lovely Fireflies that flicker in the sky.
 
-You can edit the `config.js` file to your liking.
+## Getting Started
+1. Copy the directory into your project folder
+1. Remove the example directory
+1. Link all files in the `js` folder to your html file (before your main javascript file).
 
-You can view the project on [CodePen](https://codepen.io/pouyamer/pen/RwQOwye).
+Now you can use the `addCanvas` function in your app
+
+## Configurations
+your fireflies canvas has a default configuration that can be edited in `js/config.js`
+
+
+See the 'example' folder to learn about how the application works

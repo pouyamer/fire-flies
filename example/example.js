@@ -1,21 +1,23 @@
-addCanvas(document.querySelector(".example-element"), true, {})
+/* First Example */
 
+// addCanvas(document.querySelector(".example-element"), true, {})
+
+/* Second Example */
 const secondConfig = {
-  opacityDecay: 0.025,
   fireflies: {
     number: 500,
     speed: {
       min: 1,
-      max: 10
+      max: 5
     },
     size: {
-      min: 5,
-      max: 10
+      min: 10,
+      max: 30
     },
     color: {
-      h: 10,
-      s: 100,
-      l: 65,
+      h: 30,
+      s: 85,
+      l: 70,
       a: 1
     }
   },
@@ -23,4 +25,6 @@ const secondConfig = {
   rainbowMode: true
 }
 
-addCanvas(document.querySelector(".e2"), true, secondConfig)
+// addCanvas(document.querySelector(".e2"), true, secondConfig)
+
+addCanvas(document.body, true, secondConfig)

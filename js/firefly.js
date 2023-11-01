@@ -5,10 +5,29 @@ class FireFly {
     this.config = config
     this.canvasSize = this.config.canvasSize
     this.rainbowMode = this.config.rainbowMode
+    const { min: minOpacityDecay, max: maxOpacityDecay } =
+      this.config.fireflies.opacityDecay
+
+    this.minOpacityDecay = minOpacityDecay
+    this.maxOpacityDecay = maxOpacityDecay
+
+    this.opacityDecayAmount =
+      Math.random() * (maxOpacityDecay - minOpacityDecay) + minOpacityDecay
+
+    console.log(this.opacityDecayAmount)
+
+    this.resetDecayAmountWhenFaded =
+      this.config.fireflies.resetDecayAmountWhenFaded
+
+    this.resetSizeWhenFaded = this.config.fireflies.resetDecayAmountWhenFaded
 
     // size gets randomized based on your config
-    const { min, max } = this.config.fireflies.size
-    this.size = Math.random() * (max - min) + min
+    const { min: maxSize, max: minSize } = this.config.fireflies.size
+
+    this.maxSize = maxSize
+    this.minSize = minSize
+
+    this.size = Math.random() * (maxSize - minSize) + minSize
 
     // color is an object with hsla values
     this.color = {
@@ -60,7 +79,8 @@ class FireFly {
   // if it reaches 0, it is moved to a random location
   // and its opacity is reset to a random value (> 0.5)
   liveAndDie = () => {
-    this.opacity -= this.config.opacityDecay
+    this.opacity -= this.opacityDecayAmount
+
     if (this.opacity < 0) {
       this.x = Math.random() * this.canvasSize.width
       this.y = Math.random() * this.canvasSize.height
@@ -72,6 +92,16 @@ class FireFly {
           : this.determineDirection()
 
       this.opacity = Math.random() * 0.5 + 0.5
+
+      if (this.resetDecayAmountWhenFaded) {
+        this.opacityDecayAmount =
+          Math.random() * (this.maxOpacityDecay - this.minOpacityDecay) +
+          this.minOpacityDecay
+      }
+
+      if (this.resetSizeWhenFaded) {
+        this.size = Math.random() * (this.maxSize - this.minSize) + this.minSize
+      }
     }
   }
 

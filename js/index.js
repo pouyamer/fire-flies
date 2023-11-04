@@ -78,6 +78,19 @@ const addCanvas = (
         finalConfig
       )
     )
+
+    // get the sizes right, when window gets resized:
+
+    window.addEventListener("resize", () => {
+      // setting canvas width and height to those of parentElement's
+      finalConfig.canvasSize.width =
+        getComputedStyle(parentElement).width.split("px")[0]
+      finalConfig.canvasSize.height =
+        getComputedStyle(parentElement).height.split("px")[0]
+      // -- Reiniatiating the canvas
+      firefliesCanvas.width = canvasSize.width
+      firefliesCanvas.height = canvasSize.height
+    })
   }
 
   console.log(fireflies)

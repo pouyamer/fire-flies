@@ -1,0 +1,20 @@
+{
+  "name": "fireflies-ts",
+  "version": "1.0.0",
+  "description": "A beautiful fireflies simulation made using Canvas API.",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "canvas",
+    "js",
+    "screensaver",
+    "fireflies"
+  ],
+  "author": "Pouya Moazzezi",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^5.2.2"
+  }
+}

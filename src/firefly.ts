@@ -1,3 +1,4 @@
+/* Test */
 class FireFly {
   config: IConfig
   x: number

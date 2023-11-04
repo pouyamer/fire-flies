@@ -15,7 +15,8 @@ class FireFly {
   color: IHSLColor
   xDirection: number
   yDirection: number
-  opacity: number
+  originalOpacity: number
+  currentOpacity: number
   speed: number
 
   constructor(x: number, y: number, config: IConfig) {
@@ -62,7 +63,8 @@ class FireFly {
     this.xDirection = this.determineDirection()
     this.yDirection = this.determineDirection()
 
-    this.opacity = Math.random() * 0.5 + 0.5
+    this.originalOpacity = Math.random() * 0.5 + 0.5
+    this.currentOpacity = this.originalOpacity
 
     const { min: minSpeed, max: maxSpeed } = firefliesConfig.speed
     this.speed = Math.random() * (maxSpeed - minSpeed) + minSpeed
@@ -91,7 +93,7 @@ class FireFly {
       this.color.h,
       this.color.s,
       this.color.l,
-      this.opacity
+      this.currentOpacity
     )
     ctx.fill()
   }
@@ -100,9 +102,9 @@ class FireFly {
   // if it reaches 0, it is moved to a random location
   // and its opacity is reset to a random value (> 0.5)
   liveAndDie = () => {
-    this.opacity -= this.opacityDecayAmount
+    this.currentOpacity -= this.opacityDecayAmount
 
-    if (this.opacity < 0) {
+    if (this.currentOpacity < 0) {
       this.x = Math.random() * this.canvasSize.width
       this.y = Math.random() * this.canvasSize.height
       this.xDirection = this.determineDirection()
@@ -112,7 +114,7 @@ class FireFly {
           ? this.determineDirectionIfXisNotMoving()
           : this.determineDirection()
 
-      this.opacity = Math.random() * 0.5 + 0.5
+      this.currentOpacity = Math.random() * 0.5 + 0.5
 
       if (this.resetDecayAmountWhenFaded) {
         this.opacityDecayAmount =

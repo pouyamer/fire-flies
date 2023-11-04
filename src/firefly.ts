@@ -11,18 +11,25 @@ class FireFly {
   resetSizeWhenFaded: boolean
   maxSize: number
   minSize: number
-  size: number
+  originalSize: number
+  currentSize: number
   color: IHSLColor
   xDirection: number
   yDirection: number
   originalOpacity: number
   currentOpacity: number
   speed: number
+  fadeSizeBehavior: FadeSizeBehavior
+  willChangeSize: boolean
+  minOpacityValue: number
 
   constructor(x: number, y: number, config: IConfig) {
     this.x = x
     this.y = y
     this.config = config
+
+    this.willChangeSize =
+      Math.random() < this.config.fireflies.fadeSizeBehavior.frequency
 
     const { fireflies: firefliesConfig } = this.config
 
@@ -47,8 +54,10 @@ class FireFly {
     this.maxSize = maxSize
     this.minSize = minSize
 
-    this.size = Math.random() * (maxSize - minSize) + minSize
+    this.originalSize = Math.random() * (maxSize - minSize) + minSize
+    this.currentSize = this.originalSize
 
+    this.fadeSizeBehavior = this.config.fireflies.fadeSizeBehavior.behaviorType
     // color is an object with hsla values
     this.color = {
       h: this.config.rainbowMode
@@ -63,11 +72,16 @@ class FireFly {
     this.xDirection = this.determineDirection()
     this.yDirection = this.determineDirection()
 
-    this.originalOpacity = Math.random() * 0.5 + 0.5
+    this.minOpacityValue = this.config.fireflies.minOpacityValue
+
+    this.originalOpacity =
+      Math.random() * (1 - this.minOpacityValue) + this.minOpacityValue
     this.currentOpacity = this.originalOpacity
 
     const { min: minSpeed, max: maxSpeed } = firefliesConfig.speed
     this.speed = Math.random() * (maxSpeed - minSpeed) + minSpeed
+
+    console.log(this.currentOpacity)
   }
 
   // Determine the direction of the firefly (X-wise or Y-wise)
@@ -88,13 +102,23 @@ class FireFly {
 
   draw = (ctx: CanvasRenderingContext2D) => {
     ctx.beginPath()
-    ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI)
+    ctx.arc(this.x, this.y, this.currentSize, 0, 2 * Math.PI)
     ctx.fillStyle = hslStringify(
       this.color.h,
       this.color.s,
       this.color.l,
       this.currentOpacity
     )
+
+    console.log(
+      hslStringify(
+        this.color.h,
+        this.color.s,
+        this.color.l,
+        this.currentOpacity
+      )
+    )
+
     ctx.fill()
   }
 
@@ -102,9 +126,19 @@ class FireFly {
   // if it reaches 0, it is moved to a random location
   // and its opacity is reset to a random value (> 0.5)
   liveAndDie = () => {
-    this.currentOpacity -= this.opacityDecayAmount
+    this.currentOpacity = Math.max(
+      this.currentOpacity - this.opacityDecayAmount,
+      0
+    )
 
-    if (this.currentOpacity < 0) {
+    if (this.fadeSizeBehavior === "shrink" && this.willChangeSize)
+      this.currentSize = this.currentOpacity * this.originalSize
+
+    if (this.fadeSizeBehavior === "grow" && this.willChangeSize) {
+      this.currentSize = (1 - this.currentOpacity) * this.originalSize
+    }
+
+    if (this.currentOpacity === 0) {
       this.x = Math.random() * this.canvasSize.width
       this.y = Math.random() * this.canvasSize.height
       this.xDirection = this.determineDirection()
@@ -114,7 +148,20 @@ class FireFly {
           ? this.determineDirectionIfXisNotMoving()
           : this.determineDirection()
 
-      this.currentOpacity = Math.random() * 0.5 + 0.5
+      // resetting the opacity
+      this.originalOpacity =
+        Math.random() * (1 - this.minOpacityValue) + this.minOpacityValue
+      this.currentOpacity = this.originalOpacity
+
+      if (this.fadeSizeBehavior === "shrink" && this.willChangeSize) {
+        this.currentSize = this.originalSize
+        this.currentSize = this.currentOpacity * this.originalSize
+      }
+
+      if (this.fadeSizeBehavior === "grow" && this.willChangeSize) {
+        this.currentSize = this.originalSize
+        this.currentSize = (1 - this.currentOpacity) * this.originalSize
+      }
 
       if (this.resetDecayAmountWhenFaded) {
         this.opacityDecayAmount =
@@ -123,13 +170,14 @@ class FireFly {
       }
 
       if (this.resetSizeWhenFaded) {
-        this.size = Math.random() * (this.maxSize - this.minSize) + this.minSize
+        this.currentSize =
+          Math.random() * (this.maxSize - this.minSize) + this.minSize
       }
     }
   }
 
   somewhereOverTheRainbow = () => {
-    this.color.h += Math.random() * 3 + 1
+    this.color.h += 2
   }
 
   update(ctx: CanvasRenderingContext2D) {

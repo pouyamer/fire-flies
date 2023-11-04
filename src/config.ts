@@ -13,13 +13,13 @@ const config: IConfig = {
       min: 0.2,
       max: 1
     },
-    number: 8000,
+    number: 300,
     size: {
       min: 1,
       max: 10
     },
 
-    resetSizeWhenFaded: true,
+    resetSizeWhenFaded: false,
 
     color: {
       h: 60,
@@ -28,9 +28,16 @@ const config: IConfig = {
       a: 1
     },
     opacityDecay: {
-      min: 0.009,
-      max: 0.02
+      min: 0.005,
+      max: 0.01
     },
-    resetDecayAmountWhenFaded: true
+
+    minOpacityValue: 1,
+
+    resetDecayAmountWhenFaded: false,
+    fadeSizeBehavior: {
+      behaviorType: "grow",
+      frequency: 1
+    }
   }
 }

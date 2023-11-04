@@ -1,5 +1,5 @@
 const hslStringify = (h: number, s: number, l: number, a: number = 1) =>
-  `hsl(${h}, ${s}%, ${l}%, ${a})`
+  `hsla(${h}, ${s}%, ${l}%, ${a})`
 
 const isObject = (item: object) =>
   item && typeof item === "object" && !Array.isArray(item)
@@ -93,8 +93,6 @@ const addCanvas = (
       firefliesCanvas.height = canvasSize.height
     })
   }
-
-  console.log(fireflies)
 
   const render = () => {
     // Sky

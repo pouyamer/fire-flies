@@ -14,7 +14,16 @@ interface IConfig {
     color: IHSLColor
     // rate of opacity decay
     opacityDecay: IRange
+
+    // When firefly dies,
+    // the opacity is recalculated using Math.random() * (1 - minOpacityValue) + minOpacityValue
+    // [0 - 1]
+    minOpacityValue: number
     // if true: the decayAmount gets new random value when a firefly opacity reaches zero
     resetDecayAmountWhenFaded: boolean
+    fadeSizeBehavior: {
+      behaviorType: FadeSizeBehavior
+      frequency: number
+    }
   }
 }

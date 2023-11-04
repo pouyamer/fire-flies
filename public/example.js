@@ -4,20 +4,26 @@
 
 /* Second Example */
 const secondConfig = {
+  skyColor: {
+    h: 240,
+    s: 100,
+    l: 2,
+    a: 1
+  },
   fireflies: {
     number: 100,
     speed: {
-      min: 1,
+      min: 3,
       max: 5
     },
     size: {
-      min: 10,
-      max: 30
+      min: 3,
+      max: 20
     },
     color: {
-      h: 30,
-      s: 85,
-      l: 70,
+      h: 240,
+      s: 100,
+      l: 80,
       a: 1
     }
   },

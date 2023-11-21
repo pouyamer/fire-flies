@@ -9,14 +9,18 @@ const config: IConfig = {
     a: 1
   },
   fireflies: {
-    speed: {
-      min: 0.2,
+    speedX: {
+      min: -1,
       max: 1
     },
-    number: 300,
+    speedY: {
+      min: -1,
+      max: 1
+    },
+    number: 1,
     size: {
       min: 1,
-      max: 10
+      max: 7
     },
 
     resetSizeWhenFaded: false,
@@ -28,16 +32,19 @@ const config: IConfig = {
       a: 1
     },
     opacityDecay: {
-      min: 0.005,
+      min: 0,
       max: 0.01
     },
 
     minOpacityValue: 1,
 
     resetDecayAmountWhenFaded: false,
+
     fadeSizeBehavior: {
-      behaviorType: "grow",
+      behaviorType: "none",
       frequency: 1
-    }
+    },
+
+    hueShiftMode: "none"
   }
 }

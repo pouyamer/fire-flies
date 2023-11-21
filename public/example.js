@@ -7,28 +7,24 @@ const secondConfig = {
   skyColor: {
     h: 240,
     s: 100,
-    l: 2,
+    l: 0,
     a: 1
   },
   fireflies: {
-    number: 100,
-    speed: {
-      min: 3,
-      max: 5
-    },
+    number: 120,
     size: {
       min: 3,
-      max: 20
+      max: 10
     },
     color: {
-      h: 240,
-      s: 100,
-      l: 80,
+      h: 0,
+      s: 75,
+      l: 60,
       a: 1
     }
   },
 
-  rainbowMode: true
+  rainbowMode: false
 }
 
 // addCanvas(document.querySelector(".e2"), true, secondConfig)

@@ -66,8 +66,6 @@ const addCanvas = (
     firefliesCanvas.height = canvasSize.height
   }
 
-  console.log({ finalConfig })
-
   let fireflies: FireFly[] = []
 
   // creating fireflies based on finalConfig
@@ -79,19 +77,79 @@ const addCanvas = (
         finalConfig
       )
     )
+  }
 
-    // get the sizes right, when window gets resized:
+  // get the sizes right, when window gets resized:
 
-    window.addEventListener("resize", () => {
-      // setting canvas width and height to those of parentElement's
-      finalConfig.canvasSize.width =
-        getComputedStyle(parentElement).width.split("px")[0]
-      finalConfig.canvasSize.height =
-        getComputedStyle(parentElement).height.split("px")[0]
-      // -- Reiniatiating the canvas
-      firefliesCanvas.width = canvasSize.width
-      firefliesCanvas.height = canvasSize.height
-    })
+  window.addEventListener("resize", () => {
+    // setting canvas width and height to those of parentElement's
+    finalConfig.canvasSize.width =
+      getComputedStyle(parentElement).width.split("px")[0]
+    finalConfig.canvasSize.height =
+      getComputedStyle(parentElement).height.split("px")[0]
+    // -- Reiniatiating the canvas
+    firefliesCanvas.width = canvasSize.width
+    firefliesCanvas.height = canvasSize.height
+  })
+
+  const { hueShiftMode } = finalConfig.fireflies
+
+  let hueShiftAmount = 0
+
+  if (!finalConfig.rainbowMode) {
+    // Hue shift based on mouse position
+    if (
+      hueShiftMode === "onHorizontalMousePosition" ||
+      hueShiftMode === "onVerticalMousePosition"
+    ) {
+      window.addEventListener("mousemove", e => {
+        // get the position of the canvas
+        const rect = firefliesCanvas.getBoundingClientRect()
+        // x position within the canvas
+        const x = e.clientX - rect.left
+        // y position within the canvas
+        const y = e.clientY - rect.top
+
+        if (hueShiftMode === "onHorizontalMousePosition") {
+          hueShiftAmount = (x * 360) / canvasSize.width
+        }
+
+        if (hueShiftMode === "onVerticalMousePosition") {
+          hueShiftAmount = (y * 360) / canvasSize.height
+        }
+
+        // finally:
+        fireflies.forEach(firefly => {
+          firefly.modifiedColor.h = hueShiftAmount + firefly.color.h
+        })
+      })
+    }
+
+    // hue shift based on keys (arrowDown, arrowUp)
+
+    if (hueShiftMode === "onArrowKeys") {
+      window.addEventListener("keydown", e => {
+        switch (e.key) {
+          case "ArrowUp":
+          case "ArrowRight":
+            hueShiftAmount++
+            break
+
+          case "ArrowDown":
+          case " ArrowLeft":
+            hueShiftAmount--
+            break
+
+          default:
+            break
+        }
+
+        // finally:
+        fireflies.forEach(firefly => {
+          firefly.modifiedColor.h = hueShiftAmount + firefly.color.h
+        })
+      })
+    }
   }
 
   const render = () => {

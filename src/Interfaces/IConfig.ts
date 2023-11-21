@@ -4,7 +4,8 @@ interface IConfig {
   rainbowMode: boolean // true = rainbow mode, false = normal mode
   skyColor: IHSLColor
   fireflies: {
-    speed: IRange
+    speedX: IRange
+    speedY: IRange
     number: number // Number of fireflies
     size: IRange
 
@@ -25,5 +26,6 @@ interface IConfig {
       behaviorType: FadeSizeBehavior
       frequency: number
     }
+    hueShiftMode: HueShiftModes
   }
 }

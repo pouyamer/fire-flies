@@ -14,14 +14,14 @@ class FireFly {
   originalSize: number
   currentSize: number
   color: IHSLColor
-  xDirection: number
-  yDirection: number
   originalOpacity: number
   currentOpacity: number
-  speed: number
+  speedX: number
+  speedY: number
   fadeSizeBehavior: FadeSizeBehavior
   willChangeSize: boolean
   minOpacityValue: number
+  modifiedColor: IHSLColor
 
   constructor(x: number, y: number, config: IConfig) {
     this.x = x
@@ -59,7 +59,16 @@ class FireFly {
 
     this.fadeSizeBehavior = this.config.fireflies.fadeSizeBehavior.behaviorType
     // color is an object with hsla values
+
+    //  original color before all applies
     this.color = {
+      h: firefliesConfig.color.h,
+      s: firefliesConfig.color.s,
+      l: firefliesConfig.color.l,
+      a: firefliesConfig.color.a
+    }
+
+    this.modifiedColor = {
       h: this.config.rainbowMode
         ? Math.random() * 360
         : firefliesConfig.color.h,
@@ -67,21 +76,24 @@ class FireFly {
       l: firefliesConfig.color.l,
       a: firefliesConfig.color.a
     }
+
+    /* TEST: 
     // X and Y Direction is a number between -1 and 1
     // -1 is left or up, 1 is right or down, 0 is stationary in that axis
     this.xDirection = this.determineDirection()
     this.yDirection = this.determineDirection()
-
+*/
     this.minOpacityValue = this.config.fireflies.minOpacityValue
 
     this.originalOpacity =
       Math.random() * (1 - this.minOpacityValue) + this.minOpacityValue
     this.currentOpacity = this.originalOpacity
 
-    const { min: minSpeed, max: maxSpeed } = firefliesConfig.speed
-    this.speed = Math.random() * (maxSpeed - minSpeed) + minSpeed
+    const { min: minSpeedX, max: maxSpeedX } = firefliesConfig.speedX
+    const { min: minSpeedY, max: maxSpeedY } = firefliesConfig.speedY
 
-    console.log(this.currentOpacity)
+    this.speedX = Math.random() * (maxSpeedX - minSpeedX) + minSpeedX
+    this.speedY = Math.random() * (maxSpeedY - minSpeedY) + minSpeedY
   }
 
   // Determine the direction of the firefly (X-wise or Y-wise)
@@ -89,34 +101,14 @@ class FireFly {
   // For Y: -1:up, 1:down
   // For X and Y: 0:not moving in that direction
 
-  determineDirection = (): number => {
-    const direction: number = Math.random()
-    if (direction < 0.44) return -1
-    if (direction < 0.88) return 1
-    if (direction < 1) return 0
-    return 0
-  }
-
-  // if X is not moving Y should move, so it doesn't stay still and die sadly :(
-  determineDirectionIfXisNotMoving = () => (Math.random() < 0.5 ? 1 : -1)
-
   draw = (ctx: CanvasRenderingContext2D) => {
     ctx.beginPath()
     ctx.arc(this.x, this.y, this.currentSize, 0, 2 * Math.PI)
     ctx.fillStyle = hslStringify(
-      this.color.h,
-      this.color.s,
-      this.color.l,
+      this.modifiedColor.h,
+      this.modifiedColor.s,
+      this.modifiedColor.l,
       this.currentOpacity
-    )
-
-    console.log(
-      hslStringify(
-        this.color.h,
-        this.color.s,
-        this.color.l,
-        this.currentOpacity
-      )
     )
 
     ctx.fill()
@@ -141,12 +133,6 @@ class FireFly {
     if (this.currentOpacity === 0) {
       this.x = Math.random() * this.canvasSize.width
       this.y = Math.random() * this.canvasSize.height
-      this.xDirection = this.determineDirection()
-
-      this.yDirection =
-        this.xDirection === 0
-          ? this.determineDirectionIfXisNotMoving()
-          : this.determineDirection()
 
       // resetting the opacity
       this.originalOpacity =
@@ -177,12 +163,13 @@ class FireFly {
   }
 
   somewhereOverTheRainbow = () => {
-    this.color.h += 2
+    this.modifiedColor.h += 2
   }
 
   update(ctx: CanvasRenderingContext2D) {
-    this.x += this.speed * Math.random() * this.xDirection
-    this.y += this.speed * Math.random() * this.yDirection
+    this.x += this.speedX
+    this.y += this.speedY
+
     this.draw(ctx)
     this.liveAndDie()
 

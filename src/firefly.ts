@@ -77,18 +77,13 @@ class FireFly {
       a: firefliesConfig.color.a
     }
 
-    /* TEST: 
-    // X and Y Direction is a number between -1 and 1
-    // -1 is left or up, 1 is right or down, 0 is stationary in that axis
-    this.xDirection = this.determineDirection()
-    this.yDirection = this.determineDirection()
-*/
     this.minOpacityValue = this.config.fireflies.minOpacityValue
 
     this.originalOpacity =
       Math.random() * (1 - this.minOpacityValue) + this.minOpacityValue
     this.currentOpacity = this.originalOpacity
 
+    // initializing the speeds
     const { min: minSpeedX, max: maxSpeedX } = firefliesConfig.speedX
     const { min: minSpeedY, max: maxSpeedY } = firefliesConfig.speedY
 
@@ -163,12 +158,18 @@ class FireFly {
   }
 
   somewhereOverTheRainbow = () => {
-    this.modifiedColor.h += 2
+    this.modifiedColor.h += Math.random() * 3
   }
 
   update(ctx: CanvasRenderingContext2D) {
-    this.x += this.speedX
-    this.y += this.speedY
+    // %, because it gets reset after it reaches the bounds
+    this.x = (this.x + this.speedX) % this.canvasSize.width
+    this.y = (this.y + this.speedY) % this.canvasSize.height
+
+    // if out of bounds reset position
+    // the reason that it is subtracted bt 1 is to not fall into ... % this.canvasSize.width (or height)
+    if (this.x <= 0) this.x = this.canvasSize.width - 1
+    if (this.y <= 0) this.y = this.canvasSize.height - 1
 
     this.draw(ctx)
     this.liveAndDie()

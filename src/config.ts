@@ -1,25 +1,25 @@
 const config: IConfig = {
   canvasSize: { width: innerWidth, height: innerHeight },
 
-  rainbowMode: true,
+  rainbowMode: false,
   skyColor: {
-    h: 0,
-    s: 0,
-    l: 0,
+    h: 240,
+    s: 10,
+    l: 2,
     a: 1
   },
   fireflies: {
     speedX: {
-      min: -1,
+      min: 0,
       max: 1
     },
     speedY: {
-      min: -1,
-      max: 1
+      min: 8,
+      max: 10
     },
-    number: 1,
+    number: 200,
     size: {
-      min: 1,
+      min: 4,
       max: 7
     },
 
@@ -28,12 +28,12 @@ const config: IConfig = {
     color: {
       h: 60,
       s: 95,
-      l: 80,
+      l: 75,
       a: 1
     },
     opacityDecay: {
-      min: 0,
-      max: 0.01
+      min: 0.001,
+      max: 0.02
     },
 
     minOpacityValue: 1,

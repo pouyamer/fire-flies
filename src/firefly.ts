@@ -1,42 +1,58 @@
 class FireFly {
-  config: IConfig
-  x: number
-  y: number
+  accelerationX: number
+  accelerationY: number
+  accelerateInCurrentMovingDirection: boolean
   canvasSize: { width: number; height: number }
-  rainbowMode: boolean
-  minOpacityDecay: number
+  color: IHSLColor
+  config: IConfig
+  currentOpacity: number
+  currentSize: number
+  fadeSizeBehavior: FadeSizeBehavior
   maxOpacityDecay: number
+  maxSize: number
+  minOpacityDecay: number
+  minOpacityValue: number
+  minSize: number
+  modifiedColor: IHSLColor
   opacityDecayAmount: number
+  originalOpacity: number
+  originalSize: number
+  rainbowMode: boolean
   resetDecayAmountWhenFaded: boolean
   resetSizeWhenFaded: boolean
-  maxSize: number
-  minSize: number
-  originalSize: number
-  currentSize: number
-  color: IHSLColor
-  originalOpacity: number
-  currentOpacity: number
   speedX: number
   speedY: number
-  fadeSizeBehavior: FadeSizeBehavior
   willChangeSize: boolean
-  minOpacityValue: number
-  modifiedColor: IHSLColor
+  x: number
+  y: number
+  //speed (based on acceleration)
+  modifiedSpeedX: number
+  modifiedSpeedY: number
 
   constructor(x: number, y: number, config: IConfig) {
     this.x = x
     this.y = y
     this.config = config
 
+    // Destructuring the config
+    const { fireflies: firefliesConfig } = this.config
+    const { min: minOpacityDecay, max: maxOpacityDecay } =
+      firefliesConfig.opacityDecay
+    const { min: maxSize, max: minSize } = firefliesConfig.size
+    const { min: minSpeedX, max: maxSpeedX } = firefliesConfig.speedX
+    const { min: minSpeedY, max: maxSpeedY } = firefliesConfig.speedY
+    const { accelerationX, accelerationY, accelerateInCurrentMovingDirection } =
+      firefliesConfig
+
+    this.accelerationX = accelerationX
+    this.accelerationY = accelerationY
+    this.accelerateInCurrentMovingDirection = accelerateInCurrentMovingDirection
+
     this.willChangeSize =
       Math.random() < this.config.fireflies.fadeSizeBehavior.frequency
 
-    const { fireflies: firefliesConfig } = this.config
-
     this.canvasSize = this.config.canvasSize
     this.rainbowMode = this.config.rainbowMode
-    const { min: minOpacityDecay, max: maxOpacityDecay } =
-      firefliesConfig.opacityDecay
 
     this.minOpacityDecay = minOpacityDecay
     this.maxOpacityDecay = maxOpacityDecay
@@ -49,15 +65,13 @@ class FireFly {
     this.resetSizeWhenFaded = firefliesConfig.resetDecayAmountWhenFaded
 
     // size gets randomized based on your config
-    const { min: maxSize, max: minSize } = firefliesConfig.size
-
     this.maxSize = maxSize
     this.minSize = minSize
 
     this.originalSize = Math.random() * (maxSize - minSize) + minSize
     this.currentSize = this.originalSize
 
-    this.fadeSizeBehavior = this.config.fireflies.fadeSizeBehavior.behaviorType
+    this.fadeSizeBehavior = firefliesConfig.fadeSizeBehavior.behaviorType
     // color is an object with hsla values
 
     //  original color before all applies
@@ -77,18 +91,18 @@ class FireFly {
       a: firefliesConfig.color.a
     }
 
-    this.minOpacityValue = this.config.fireflies.minOpacityValue
+    this.minOpacityValue = firefliesConfig.minOpacityValue
 
     this.originalOpacity =
       Math.random() * (1 - this.minOpacityValue) + this.minOpacityValue
     this.currentOpacity = this.originalOpacity
 
     // initializing the speeds
-    const { min: minSpeedX, max: maxSpeedX } = firefliesConfig.speedX
-    const { min: minSpeedY, max: maxSpeedY } = firefliesConfig.speedY
-
     this.speedX = Math.random() * (maxSpeedX - minSpeedX) + minSpeedX
     this.speedY = Math.random() * (maxSpeedY - minSpeedY) + minSpeedY
+
+    this.modifiedSpeedX = this.speedX
+    this.modifiedSpeedY = this.speedY
   }
 
   // Determine the direction of the firefly (X-wise or Y-wise)
@@ -129,6 +143,10 @@ class FireFly {
       this.x = Math.random() * this.canvasSize.width
       this.y = Math.random() * this.canvasSize.height
 
+      // resets speed (based on acceleration)
+      this.modifiedSpeedX = this.speedX
+      this.modifiedSpeedY = this.speedY
+
       // resetting the opacity
       this.originalOpacity =
         Math.random() * (1 - this.minOpacityValue) + this.minOpacityValue
@@ -163,13 +181,24 @@ class FireFly {
 
   update(ctx: CanvasRenderingContext2D) {
     // %, because it gets reset after it reaches the bounds
-    this.x = (this.x + this.speedX) % this.canvasSize.width
-    this.y = (this.y + this.speedY) % this.canvasSize.height
+    this.x = (this.x + this.modifiedSpeedX) % this.canvasSize.width
+    this.y = (this.y + this.modifiedSpeedY) % this.canvasSize.height
 
     // if out of bounds reset position
     // the reason that it is subtracted bt 1 is to not fall into ... % this.canvasSize.width (or height)
-    if (this.x <= 0) this.x = this.canvasSize.width - 1
+    if (this.x <= 0) {
+      // --  reset the speed after going out of bounds
+      this.x = this.canvasSize.width - 1
+    }
     if (this.y <= 0) this.y = this.canvasSize.height - 1
+
+    // increase/decreasing speed of fireflies bt acceleration
+    this.modifiedSpeedX +=
+      this.accelerationX *
+      (this.accelerateInCurrentMovingDirection ? Math.sign(this.speedX) : 1)
+    this.modifiedSpeedY +=
+      this.accelerationY *
+      (this.accelerateInCurrentMovingDirection ? Math.sign(this.speedY) : 1)
 
     this.draw(ctx)
     this.liveAndDie()

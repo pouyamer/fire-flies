@@ -4,8 +4,15 @@ interface IConfig {
   rainbowMode: boolean // true = rainbow mode, false = normal mode
   skyColor: IHSLColor
   fireflies: {
+    // speed in which firefly moves
     speedX: IRange
     speedY: IRange
+
+    // speed in which firefly's speed increases
+    accelerationX: number
+    accelerationY: number
+    accelerateInCurrentMovingDirection: boolean
+
     number: number // Number of fireflies
     size: IRange
 

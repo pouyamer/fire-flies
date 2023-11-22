@@ -10,30 +10,34 @@ const config: IConfig = {
   },
   fireflies: {
     speedX: {
-      min: 0,
+      min: -1,
       max: 1
     },
     speedY: {
-      min: 8,
-      max: 10
+      min: -0.5,
+      max: 1
     },
-    number: 200,
+    accelerationX: 0.0025,
+    accelerationY: 0.001,
+    accelerateInCurrentMovingDirection: true,
+
+    number: 500,
     size: {
-      min: 4,
-      max: 7
+      min: 5,
+      max: 10
     },
 
     resetSizeWhenFaded: false,
 
     color: {
-      h: 60,
-      s: 95,
-      l: 75,
+      h: 15,
+      s: 100,
+      l: 70,
       a: 1
     },
     opacityDecay: {
-      min: 0.001,
-      max: 0.02
+      min: 0.005,
+      max: 0.009
     },
 
     minOpacityValue: 1,

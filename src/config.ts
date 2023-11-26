@@ -3,46 +3,44 @@ const config: IConfig = {
 
   rainbowMode: false,
   skyColor: {
-    h: 240,
-    s: 10,
-    l: 2,
+    h: 20,
+    s: 75,
+    l: 0,
     a: 1
   },
   fireflies: {
-    number: 200,
+    number: 120,
 
     speedX: {
-      min: -4,
-      max: 4
+      min: -1,
+      max: 1
     },
     speedY: {
       min: 0,
-      max: 6
+      max: 0
     },
-    accelerationX: 0,
-    accelerationY: 0.1,
+    accelerationX: 0.0,
+    accelerationY: 10 / 60,
     accelerateInCurrentMovingDirection: false,
 
     size: {
-      min: 3,
-      max: 20
+      min: 12,
+      max: 35
     },
 
-    resetSizeWhenFaded: true,
-
-    coloringMode: "randomHue",
+    coloringMode: "randomHslColor",
 
     singleColorValue: {
       h: 200,
       s: 100,
-      l: 70,
+      l: 100,
       a: 1
     },
 
     hueRangeSpecification: {
       h: {
-        min: 0,
-        max: 150
+        min: 100,
+        max: 200
       },
       s: 100,
       l: 70,
@@ -71,19 +69,19 @@ const config: IConfig = {
 
     hslColorRangeSpecification: {
       h: {
-        min: 330,
-        max: 360
+        min: 180,
+        max: 140
       },
       s: {
         min: 70,
         max: 100
       },
       l: {
-        min: 30,
-        max: 80
+        min: 20,
+        max: 50
       },
       a: {
-        min: 0.8,
+        min: 0,
         max: 1
       }
     },
@@ -125,14 +123,30 @@ const config: IConfig = {
 
     opacityDecay: {
       min: 0.01,
-      max: 0.06
+      max: 0.03
     },
 
     resetDecayAmountWhenFaded: false,
     resetColorWhenFaded: true,
     randomOpacityWhenFaded: true,
+    resetSizeWhenFaded: true,
+
+    outOfBoundsPositioningBehaviour: "none",
+    fadePositioningBehaviour: "restartAtRandomPosition",
+
+    resetSpeedWhenOutOfBounds: true,
+
+    outOfBoundsRestartPosition: {
+      x: 0,
+      y: -10
+    },
+    fadeRestartPosition: {
+      x: innerWidth / 2,
+      y: innerHeight
+    },
+
     opacityWhenFaded: {
-      min: 0.7,
+      min: 1,
       max: 1
     },
 

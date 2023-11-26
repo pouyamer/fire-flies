@@ -32,7 +32,7 @@ const addCanvas = (
   positionedInElement = true,
   desiredConfig = {}
 ) => {
-  const finalConfig = deepMerge(config, desiredConfig)
+  const finalConfig: IConfig = deepMerge(config, desiredConfig)
   const { canvasSize } = finalConfig
 
   const firefliesCanvas = createCanvasElement()
@@ -56,10 +56,12 @@ const addCanvas = (
     firefliesCanvas.style.height = "100%"
 
     // setting canvas width and height to those of parentElement's
-    finalConfig.canvasSize.width =
+    finalConfig.canvasSize.width = parseInt(
       getComputedStyle(parentElement).width.split("px")[0]
-    finalConfig.canvasSize.height =
+    )
+    finalConfig.canvasSize.height = parseInt(
       getComputedStyle(parentElement).height.split("px")[0]
+    )
 
     // -- Reiniatiating the canvas
     firefliesCanvas.width = canvasSize.width
@@ -83,10 +85,12 @@ const addCanvas = (
 
   window.addEventListener("resize", () => {
     // setting canvas width and height to those of parentElement's
-    finalConfig.canvasSize.width =
+    finalConfig.canvasSize.width = parseInt(
       getComputedStyle(parentElement).width.split("px")[0]
-    finalConfig.canvasSize.height =
+    )
+    finalConfig.canvasSize.height = parseInt(
       getComputedStyle(parentElement).height.split("px")[0]
+    )
     // -- Reiniatiating the canvas
     firefliesCanvas.width = canvasSize.width
     firefliesCanvas.height = canvasSize.height

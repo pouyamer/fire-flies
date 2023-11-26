@@ -120,7 +120,8 @@ const addCanvas = (
 
         // finally:
         fireflies.forEach(firefly => {
-          firefly.modifiedColor.h = hueShiftAmount + firefly.color.h
+          firefly.config.colorValue.h =
+            hueShiftAmount + firefly.config.colorValue.h
         })
       })
     }
@@ -146,7 +147,8 @@ const addCanvas = (
 
         // finally:
         fireflies.forEach(firefly => {
-          firefly.modifiedColor.h = hueShiftAmount + firefly.color.h
+          firefly.config.colorValue.h =
+            hueShiftAmount + firefly.config.colorValue.h
         })
       })
     }

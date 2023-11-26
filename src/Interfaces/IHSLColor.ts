@@ -2,6 +2,6 @@ interface IHSLColor {
   h: number
   s: number
   l: number
-  a?: number
+  a: number
   toString?: () => string
 }

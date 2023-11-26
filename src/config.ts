@@ -9,28 +9,28 @@ const config: IConfig = {
     a: 1
   },
   fireflies: {
-    number: 500,
+    number: 200,
 
     speedX: {
-      min: 0.05,
-      max: 0.5
+      min: -4,
+      max: 4
     },
     speedY: {
-      min: 0.07,
-      max: 0.7
+      min: 0,
+      max: 6
     },
-    accelerationX: 0.001,
-    accelerationY: -0.002,
+    accelerationX: 0,
+    accelerationY: 0.1,
     accelerateInCurrentMovingDirection: false,
 
     size: {
-      min: 5,
-      max: 15
+      min: 3,
+      max: 20
     },
 
-    resetSizeWhenFaded: false,
+    resetSizeWhenFaded: true,
 
-    coloringMode: "multipleColorValues",
+    coloringMode: "randomHue",
 
     singleColorValue: {
       h: 200,
@@ -41,8 +41,8 @@ const config: IConfig = {
 
     hueRangeSpecification: {
       h: {
-        min: 120,
-        max: 360
+        min: 0,
+        max: 150
       },
       s: 100,
       l: 70,
@@ -124,14 +124,17 @@ const config: IConfig = {
     ],
 
     opacityDecay: {
-      min: 0.005,
-      max: 0.015
+      min: 0.01,
+      max: 0.06
     },
-
-    minOpacityValue: 1,
 
     resetDecayAmountWhenFaded: false,
     resetColorWhenFaded: true,
+    randomOpacityWhenFaded: true,
+    opacityWhenFaded: {
+      min: 0.7,
+      max: 1
+    },
 
     fadeSizeBehavior: {
       behaviorType: "none",

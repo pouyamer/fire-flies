@@ -54,6 +54,7 @@ class FireFly {
     }
 
     this.canvasSize = this.appConfig.canvasSize
+
     this.rainbowMode = this.appConfig.rainbowMode
   }
 
@@ -163,21 +164,15 @@ class FireFly {
     ctx.fill()
   }
 
-  // liveAndDie() lowers the opacity of the firefly
+  // handleFade() lowers the opacity of the firefly
   // if it reaches 0, it is moved to a random location
   // and its opacity is reset to a random value (> 0.5)
-  liveAndDie = () => {
+  handleFade = () => {
     const { opacityDecay, fadeSizeBehaviorType, willChangeSize } = this.config
-    const { min: minOpacityWhenFaded, max: maxOpacityWhenFaded } =
-      this.appConfig.fireflies.opacityWhenFaded
     this.config.opacity = this.config.opacity - opacityDecay
 
     if (this.config.opacity < 0) {
-      this.config.opacity = this.appConfig.fireflies.randomOpacityWhenFaded
-        ? Math.random() * (maxOpacityWhenFaded - minOpacityWhenFaded) +
-          minOpacityWhenFaded
-        : this.originalConfig.opacity
-      this.onFade()
+      this.resetConfigAfterFade()
     }
 
     if (fadeSizeBehaviorType === "shrink" && willChangeSize)
@@ -188,7 +183,7 @@ class FireFly {
     }
   }
 
-  onFade = () => {
+  resetConfigAfterFade = () => {
     const {
       resetSizeWhenFaded,
       resetColorWhenFaded,
@@ -196,20 +191,13 @@ class FireFly {
       willChangeSize,
       resetDecayAmountWhenFaded
     } = this.config
-
     const { min: minOpacityDecay, max: maxOpacityDecay } =
       this.appConfig.fireflies.opacityDecay
     const { min: minSize, max: maxSize } = this.appConfig.fireflies.size
+    const { min: minOpacityWhenFaded, max: maxOpacityWhenFaded } =
+      this.appConfig.fireflies.opacityWhenFaded
 
-    // resetting the opacity
-    // this.config.opacity = this.originalConfig.opacity
-
-    this.x = Math.random() * this.canvasSize.width
-    this.y = Math.random() * this.canvasSize.height
-
-    // resets speed (based on acceleration)
-    this.config.speedX = this.originalConfig.speedX
-    this.config.speedY = this.originalConfig.speedY
+    this.resetSpeed()
 
     if (fadeSizeBehaviorType === "shrink" && willChangeSize) {
       this.config.size = this.config.opacity * this.originalConfig.size
@@ -231,25 +219,139 @@ class FireFly {
     if (resetColorWhenFaded) {
       this.determineColor(this.appConfig.fireflies.coloringMode)
     }
+
+    this.handleFadePositioning(
+      this.appConfig.fireflies.fadePositioningBehaviour
+    )
+
+    // resets the opacity to a new or original opacity
+    this.config.opacity = this.appConfig.fireflies.randomOpacityWhenFaded
+      ? Math.random() * (maxOpacityWhenFaded - minOpacityWhenFaded) +
+        minOpacityWhenFaded
+      : this.originalConfig.opacity
   }
 
   somewhereOverTheRainbow = () => {
     this.config.colorValue.h += Math.random() * 3
   }
 
-  update(ctx: CanvasRenderingContext2D) {
-    // %, because it gets reset after it reaches the bounds
-    this.x = (this.x + this.config.speedX) % this.canvasSize.width
-    this.y = (this.y + this.config.speedY) % this.canvasSize.height
+  handleFadePositioning = (behaviour: FadePositioningBehaviours) => {
+    const { fadeRestartPosition } = this.appConfig.fireflies
 
-    // if out of bounds reset position
-    // the reason that it is subtracted bt 1 is to not fall into ... % this.canvasSize.width (or height)
-    if (this.x <= 0) {
-      // --  reset the speed after going out of bounds
-      this.x = this.canvasSize.width - 1
+    switch (behaviour) {
+      case "none":
+        break
+      case "restartAtCenterOfCanvas":
+        this.x = this.canvasSize.width / 2
+        this.y = this.canvasSize.height / 2
+        break
+      case "restartAtRandomPosition":
+        this.x = Math.random() * this.canvasSize.width
+        this.y = Math.random() * this.canvasSize.height
+        break
+      case "restartAtRandomXPosition":
+        this.x = Math.random() * this.canvasSize.width
+        this.y = fadeRestartPosition.y
+        break
+      case "restartAtRandomYPosition":
+        this.x = fadeRestartPosition.x
+        this.y = Math.random() * this.canvasSize.height
+        break
+
+      case "restartAtSetPosition":
+        this.x = fadeRestartPosition.x
+        this.y = fadeRestartPosition.y
+        break
+      default:
+        throw new Error("Unknown FadePositioningBehaviour")
     }
-    if (this.y <= 0) this.y = this.canvasSize.height - 1
+  }
 
+  handleOutOfBoundsPositioning = (
+    behaviour: OutOfBoundsPositioningBehaviours
+  ) => {
+    const { outOfBoundsRestartPosition } = this.appConfig.fireflies
+
+    const { size } = this.config
+    const isOutOfBoundsFromLeft = this.x <= -size
+    const isOutOfBoundsFromRight = this.x >= this.canvasSize.width + size
+    const isOutOfBoundsFromTop = this.y <= -size
+    const isOutOfBoundsFromBottom = this.y >= this.canvasSize.height + size
+
+    const isOutOfBounds =
+      isOutOfBoundsFromLeft ||
+      isOutOfBoundsFromRight ||
+      isOutOfBoundsFromTop ||
+      isOutOfBoundsFromBottom
+
+    if (isOutOfBounds && this.appConfig.fireflies.resetSpeedWhenOutOfBounds) {
+      this.resetSpeed()
+    }
+
+    switch (behaviour) {
+      case "forceFade":
+        if (isOutOfBounds) {
+          this.config.opacity = 0
+        }
+        break
+      case "continueOnOtherSide":
+        // --  reset the speed after going out of bounds
+        if (isOutOfBoundsFromLeft) this.x = this.canvasSize.width + size
+        if (isOutOfBoundsFromRight) this.x = -size
+        if (isOutOfBoundsFromTop) this.y = this.canvasSize.height + size
+        if (isOutOfBoundsFromBottom) this.y = -size
+        break
+
+      case "restartAtRandomPosition":
+        if (isOutOfBounds) {
+          this.x = Math.random() * this.canvasSize.width
+          this.y = Math.random() * this.canvasSize.height
+        }
+        break
+
+      case "restartAtSetPosition":
+        if (isOutOfBounds) {
+          this.x = outOfBoundsRestartPosition.x
+          this.y = outOfBoundsRestartPosition.y
+        }
+        break
+
+      case "restartAtRandomXPosition":
+        if (isOutOfBounds) {
+          this.x = Math.random() * this.canvasSize.width
+          this.y = outOfBoundsRestartPosition.y
+        }
+        break
+
+      case "restartAtRandomYPosition":
+        if (isOutOfBounds) {
+          this.x = outOfBoundsRestartPosition.x
+          this.y = Math.random() * this.canvasSize.height
+        }
+        break
+
+      case "restartAtCenterOfCanvas":
+        if (isOutOfBounds) {
+          this.x = this.canvasSize.width / 2
+          this.y = this.canvasSize.height / 2
+        }
+        break
+
+      case "none":
+        break
+      default:
+        throw new Error("Unknown OutOfBoundPositioningBehaviors")
+        break
+    }
+  }
+
+  resetSpeed = () => {
+    // resets speed (based on acceleration)
+    this.config.speedX = this.originalConfig.speedX
+    this.config.speedY = this.originalConfig.speedY
+  }
+
+  handleAcceleration = () => {
     // increase/decreasing speed of fireflies bt acceleration
     this.config.speedX +=
       this.config.accelerationX *
@@ -261,12 +363,25 @@ class FireFly {
       (this.config.accelerateInCurrentMovingDirection
         ? Math.sign(this.config.speedY)
         : 1)
+  }
 
-    this.draw(ctx)
-    this.liveAndDie()
+  handleMove = () => {
+    this.handleOutOfBoundsPositioning(
+      this.appConfig.fireflies.outOfBoundsPositioningBehaviour
+    )
 
+    this.x += this.config.speedX
+    this.y += this.config.speedY
+  }
+
+  update(ctx: CanvasRenderingContext2D) {
+    this.handleFade()
+    this.handleMove()
+    this.handleAcceleration()
     if (this.rainbowMode) {
       this.somewhereOverTheRainbow()
     }
+
+    this.draw(ctx)
   }
 }

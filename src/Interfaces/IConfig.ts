@@ -77,11 +77,30 @@ interface IConfig {
     randomOpacityWhenFaded: boolean
     opacityWhenFaded: IRange
 
+    // what a firefly do after it gets out of bounds
+    outOfBoundsPositioningBehaviour: OutOfBoundsPositioningBehaviours
+    // -- position for
+    // -- if afterOutOfBoundBehavior = restartAtSetPosition
+    outOfBoundsRestartPosition: {
+      x: number
+      y: number
+    }
+
+    resetSpeedWhenOutOfBounds: boolean
+
     // if true: the decayAmount gets new random value when a firefly opacity reaches zero
     resetDecayAmountWhenFaded: boolean
     fadeSizeBehavior: {
       behaviorType: FadeSizeBehavior
       frequency: number
+    }
+
+    // it determines what new position fireflies have
+    // after fading
+    fadePositioningBehaviour: FadePositioningBehaviours
+    fadeRestartPosition: {
+      x: number
+      y: number
     }
     hueShiftMode: HueShiftModes
   }

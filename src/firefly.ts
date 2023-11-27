@@ -7,40 +7,47 @@ class FireFly {
   x: number
   y: number
 
+  utilGetRandomNumberBetween = (
+    range: IRange,
+    getAsInteger: boolean = false
+  ) => {
+    const { min, max } = range
+    if (getAsInteger) return Math.floor(Math.random() * (max - min) + min)
+    return Math.random() * (max - min) + min
+  }
+
   constructor(x: number, y: number, appConfig: IConfig) {
     this.x = x
     this.y = y
     this.appConfig = appConfig
-    const firefliesConfig = appConfig.fireflies
 
-    const { min: maxSize, max: minSize } = firefliesConfig.size
-    const { min: minSpeedX, max: maxSpeedX } = firefliesConfig.speedX
-    const { min: minSpeedY, max: maxSpeedY } = firefliesConfig.speedY
-    const { accelerationX, accelerationY, accelerateInCurrentMovingDirection } =
-      firefliesConfig
-    const { min: minOpacityDecay, max: maxOpacityDecay } =
-      firefliesConfig.opacityDecay
+    // getting range values
+    const firefliesConfig = appConfig.fireflies
+    const {
+      size,
+      speedX,
+      speedY,
+      fadeRate,
+      jitterCoefficientX,
+      jitterCoefficientY
+    } = firefliesConfig
 
     this.config = {
-      accelerateInCurrentMovingDirection,
-      accelerationX,
-      accelerationY,
       colorValue: this.determineColor(firefliesConfig.coloringMode),
-      fadeSizeBehaviorType:
-        Math.random() < firefliesConfig.fadeSizeBehavior.frequency
-          ? firefliesConfig.fadeSizeBehavior.behaviorType
+      jitterX: this.utilGetRandomNumberBetween(jitterCoefficientX),
+      jitterY: this.utilGetRandomNumberBetween(jitterCoefficientY),
+      sizeBehaviourWhenFading:
+        Math.random() < firefliesConfig.sizeBehaviourWhenFading.frequency
+          ? firefliesConfig.sizeBehaviourWhenFading.behaviorType
           : "none",
       opacity: this.determineColor(firefliesConfig.coloringMode).a,
-      opacityDecay:
-        Math.random() * (maxOpacityDecay - minOpacityDecay) + minOpacityDecay,
-      resetColorWhenFaded: firefliesConfig.resetColorWhenFaded,
-      resetDecayAmountWhenFaded: firefliesConfig.resetDecayAmountWhenFaded,
-      resetSizeWhenFaded: firefliesConfig.resetSizeWhenFaded,
+      fadeRate: this.utilGetRandomNumberBetween(fadeRate),
       // size gets randomized based on your config
-      size: Math.random() * (maxSize - minSize) + minSize,
-      speedX: Math.random() * (maxSpeedX - minSpeedX) + minSpeedX,
-      speedY: Math.random() * (maxSpeedY - minSpeedY) + minSpeedY,
-      willChangeSize: Math.random() < firefliesConfig.fadeSizeBehavior.frequency
+      size: this.utilGetRandomNumberBetween(size),
+      speedX: this.utilGetRandomNumberBetween(speedX),
+      speedY: this.utilGetRandomNumberBetween(speedY),
+      willChangeSize:
+        Math.random() < firefliesConfig.sizeBehaviourWhenFading.frequency
     }
 
     // color value is an object, so it must be copied
@@ -60,44 +67,37 @@ class FireFly {
 
   determineColor = (coloringMode: ColoringModes): IHSLColor => {
     const { fireflies: firefliesConfig } = this.appConfig
+    const {
+      singleColorValue,
+      hueRangeSpecification,
+      saturationRangeSpecification,
+      lightnessRangeSpecification
+    } = firefliesConfig
+
     switch (coloringMode) {
       case "singleColor":
-        return firefliesConfig.singleColorValue
+        return {
+          ...firefliesConfig.singleColorValue,
+
+          h: firefliesConfig.singleColorValue.h
+        }
 
       case "randomHue":
         return {
-          ...firefliesConfig.hueRangeSpecification,
-          h:
-            Math.floor(
-              Math.random() *
-                (firefliesConfig.hueRangeSpecification.h.max -
-                  firefliesConfig.hueRangeSpecification.h.min +
-                  1)
-            ) + firefliesConfig.hueRangeSpecification.h.min
+          ...singleColorValue,
+          h: this.utilGetRandomNumberBetween(hueRangeSpecification)
         }
 
       case "randomSaturation":
         return {
-          ...firefliesConfig.saturationRangeSpecification,
-          s:
-            Math.floor(
-              Math.random() *
-                (firefliesConfig.saturationRangeSpecification.s.max -
-                  firefliesConfig.saturationRangeSpecification.s.min +
-                  1)
-            ) + firefliesConfig.saturationRangeSpecification.s.min
+          ...singleColorValue,
+          s: this.utilGetRandomNumberBetween(saturationRangeSpecification)
         }
 
       case "randomLightness":
         return {
-          ...firefliesConfig.lightnessRangeSpecification,
-          l:
-            Math.floor(
-              Math.random() *
-                (firefliesConfig.lightnessRangeSpecification.l.max -
-                  firefliesConfig.lightnessRangeSpecification.l.min +
-                  1)
-            ) + firefliesConfig.lightnessRangeSpecification.l.min
+          ...singleColorValue,
+          l: this.utilGetRandomNumberBetween(lightnessRangeSpecification)
         }
 
       case "randomHslColor":
@@ -109,20 +109,10 @@ class FireFly {
         } = firefliesConfig.hslColorRangeSpecification
 
         return {
-          h:
-            Math.floor(Math.random() * (hueRSpec.max - hueRSpec.min + 1)) +
-            hueRSpec.min,
-          s:
-            Math.floor(
-              Math.random() * (saturationRSpec.max - saturationRSpec.min + 1)
-            ) + saturationRSpec.min,
-          l:
-            Math.floor(
-              Math.random() * (lightnessRSpec.max - lightnessRSpec.min + 1)
-            ) + lightnessRSpec.min,
-          a:
-            Math.floor(Math.random() * (alphaRSpec.max - alphaRSpec.min + 1)) +
-            alphaRSpec.min
+          h: this.utilGetRandomNumberBetween(hueRSpec),
+          s: this.utilGetRandomNumberBetween(saturationRSpec),
+          l: this.utilGetRandomNumberBetween(lightnessRSpec),
+          a: this.utilGetRandomNumberBetween(alphaRSpec)
         }
 
       case "multipleColorValues":
@@ -151,11 +141,11 @@ class FireFly {
     }
   }
 
-  draw = (ctx: CanvasRenderingContext2D) => {
+  draw = (ctx: CanvasRenderingContext2D, hueShiftAmount: number = 0) => {
     ctx.beginPath()
     ctx.arc(this.x, this.y, this.config.size, 0, 2 * Math.PI)
     ctx.fillStyle = hslStringify(
-      this.config.colorValue.h,
+      this.config.colorValue.h + hueShiftAmount,
       this.config.colorValue.s,
       this.config.colorValue.l,
       this.config.opacity
@@ -168,55 +158,48 @@ class FireFly {
   // if it reaches 0, it is moved to a random location
   // and its opacity is reset to a random value (> 0.5)
   handleFade = () => {
-    const { opacityDecay, fadeSizeBehaviorType, willChangeSize } = this.config
-    this.config.opacity = this.config.opacity - opacityDecay
+    const { fadeRate, sizeBehaviourWhenFading, willChangeSize } = this.config
+    this.config.opacity = this.config.opacity - fadeRate
 
     if (this.config.opacity < 0) {
       this.resetConfigAfterFade()
     }
 
-    if (fadeSizeBehaviorType === "shrink" && willChangeSize)
+    if (sizeBehaviourWhenFading === "shrink" && willChangeSize)
       this.config.size = this.config.opacity * this.originalConfig.size
 
-    if (fadeSizeBehaviorType === "grow" && willChangeSize) {
+    if (sizeBehaviourWhenFading === "grow" && willChangeSize) {
       this.config.size = (1 - this.config.opacity) * this.originalConfig.size
     }
   }
 
   resetConfigAfterFade = () => {
-    const {
-      resetSizeWhenFaded,
-      resetColorWhenFaded,
-      fadeSizeBehaviorType,
-      willChangeSize,
-      resetDecayAmountWhenFaded
-    } = this.config
-    const { min: minOpacityDecay, max: maxOpacityDecay } =
-      this.appConfig.fireflies.opacityDecay
-    const { min: minSize, max: maxSize } = this.appConfig.fireflies.size
-    const { min: minOpacityWhenFaded, max: maxOpacityWhenFaded } =
-      this.appConfig.fireflies.opacityWhenFaded
+    const { sizeBehaviourWhenFading, willChangeSize } = this.config
 
-    this.resetSpeed()
+    const { resetColorAfterFade, resetSizeAfterFade, resetFadeRateAfterFade } =
+      this.appConfig.fireflies
 
-    if (fadeSizeBehaviorType === "shrink" && willChangeSize) {
+    const { size, fadeRate, newFadeRateAfterFade } = this.appConfig.fireflies
+
+    this.resetSpeeds()
+
+    if (sizeBehaviourWhenFading === "shrink" && willChangeSize) {
       this.config.size = this.config.opacity * this.originalConfig.size
     }
 
-    if (fadeSizeBehaviorType === "grow" && willChangeSize) {
+    if (sizeBehaviourWhenFading === "grow" && willChangeSize) {
       this.config.size = (1 - this.config.opacity) * this.originalConfig.size
     }
 
-    if (resetDecayAmountWhenFaded) {
-      this.config.opacityDecay =
-        Math.random() * (maxOpacityDecay - minOpacityDecay) + minOpacityDecay
+    if (resetFadeRateAfterFade) {
+      this.config.fadeRate = this.utilGetRandomNumberBetween(fadeRate)
     }
 
-    if (resetSizeWhenFaded) {
-      this.config.size = Math.random() * (maxSize - minSize) + minSize
+    if (resetSizeAfterFade) {
+      this.config.size = this.utilGetRandomNumberBetween(size)
     }
 
-    if (resetColorWhenFaded) {
+    if (resetColorAfterFade) {
       this.determineColor(this.appConfig.fireflies.coloringMode)
     }
 
@@ -225,9 +208,8 @@ class FireFly {
     )
 
     // resets the opacity to a new or original opacity
-    this.config.opacity = this.appConfig.fireflies.randomOpacityWhenFaded
-      ? Math.random() * (maxOpacityWhenFaded - minOpacityWhenFaded) +
-        minOpacityWhenFaded
+    this.config.opacity = this.appConfig.fireflies.resetFadeRateAfterFade
+      ? this.utilGetRandomNumberBetween(newFadeRateAfterFade)
       : this.originalConfig.opacity
   }
 
@@ -236,7 +218,7 @@ class FireFly {
   }
 
   handleFadePositioning = (behaviour: FadePositioningBehaviours) => {
-    const { fadeRestartPosition } = this.appConfig.fireflies
+    const { newPositionAfterFade } = this.appConfig.fireflies
 
     switch (behaviour) {
       case "none":
@@ -251,16 +233,16 @@ class FireFly {
         break
       case "restartAtRandomXPosition":
         this.x = Math.random() * this.canvasSize.width
-        this.y = fadeRestartPosition.y
+        this.y = newPositionAfterFade.y
         break
       case "restartAtRandomYPosition":
-        this.x = fadeRestartPosition.x
+        this.x = newPositionAfterFade.x
         this.y = Math.random() * this.canvasSize.height
         break
 
       case "restartAtSetPosition":
-        this.x = fadeRestartPosition.x
-        this.y = fadeRestartPosition.y
+        this.x = newPositionAfterFade.x
+        this.y = newPositionAfterFade.y
         break
       default:
         throw new Error("Unknown FadePositioningBehaviour")
@@ -270,13 +252,13 @@ class FireFly {
   handleOutOfBoundsPositioning = (
     behaviour: OutOfBoundsPositioningBehaviours
   ) => {
-    const { outOfBoundsRestartPosition } = this.appConfig.fireflies
+    const { newPositionAfterOutOfBounds } = this.appConfig.fireflies
 
     const { size } = this.config
-    const isOutOfBoundsFromLeft = this.x <= -size
-    const isOutOfBoundsFromRight = this.x >= this.canvasSize.width + size
-    const isOutOfBoundsFromTop = this.y <= -size
-    const isOutOfBoundsFromBottom = this.y >= this.canvasSize.height + size
+    const isOutOfBoundsFromLeft = this.x < -size
+    const isOutOfBoundsFromRight = this.x > this.canvasSize.width + size
+    const isOutOfBoundsFromTop = this.y < -size
+    const isOutOfBoundsFromBottom = this.y > this.canvasSize.height + size
 
     const isOutOfBounds =
       isOutOfBoundsFromLeft ||
@@ -284,8 +266,10 @@ class FireFly {
       isOutOfBoundsFromTop ||
       isOutOfBoundsFromBottom
 
-    if (isOutOfBounds && this.appConfig.fireflies.resetSpeedWhenOutOfBounds) {
-      this.resetSpeed()
+    isOutOfBounds && console.log(this.x, this.y)
+
+    if (isOutOfBounds && this.appConfig.fireflies.resetSpeedsAfterOutOfBounds) {
+      this.resetSpeeds()
     }
 
     switch (behaviour) {
@@ -311,21 +295,21 @@ class FireFly {
 
       case "restartAtSetPosition":
         if (isOutOfBounds) {
-          this.x = outOfBoundsRestartPosition.x
-          this.y = outOfBoundsRestartPosition.y
+          this.x = newPositionAfterOutOfBounds.x
+          this.y = newPositionAfterOutOfBounds.y
         }
         break
 
       case "restartAtRandomXPosition":
         if (isOutOfBounds) {
           this.x = Math.random() * this.canvasSize.width
-          this.y = outOfBoundsRestartPosition.y
+          this.y = newPositionAfterOutOfBounds.y
         }
         break
 
       case "restartAtRandomYPosition":
         if (isOutOfBounds) {
-          this.x = outOfBoundsRestartPosition.x
+          this.x = newPositionAfterOutOfBounds.x
           this.y = Math.random() * this.canvasSize.height
         }
         break
@@ -345,24 +329,23 @@ class FireFly {
     }
   }
 
-  resetSpeed = () => {
+  resetSpeeds = () => {
     // resets speed (based on acceleration)
     this.config.speedX = this.originalConfig.speedX
     this.config.speedY = this.originalConfig.speedY
   }
 
   handleAcceleration = () => {
+    const { accelerateInCurrentMovingDirection, accelerationX, accelerationY } =
+      this.appConfig.fireflies
     // increase/decreasing speed of fireflies bt acceleration
     this.config.speedX +=
-      this.config.accelerationX *
-      (this.config.accelerateInCurrentMovingDirection
-        ? Math.sign(this.config.speedX)
-        : 1)
+      accelerationX *
+      (accelerateInCurrentMovingDirection ? Math.sign(this.config.speedX) : 1)
+
     this.config.speedY +=
-      this.config.accelerationY *
-      (this.config.accelerateInCurrentMovingDirection
-        ? Math.sign(this.config.speedY)
-        : 1)
+      accelerationY *
+      (accelerateInCurrentMovingDirection ? Math.sign(this.config.speedY) : 1)
   }
 
   handleMove = () => {
@@ -374,14 +357,22 @@ class FireFly {
     this.y += this.config.speedY
   }
 
-  update(ctx: CanvasRenderingContext2D) {
+  handleJitter = () => {
+    const { jitterX, jitterY } = this.config
+
+    this.x += jitterX * 2 * Math.random() - jitterX
+    this.y += jitterY * 2 * Math.random() - jitterY
+  }
+
+  update(ctx: CanvasRenderingContext2D, hueShiftAmount: number) {
     this.handleFade()
     this.handleMove()
     this.handleAcceleration()
+    this.handleJitter()
     if (this.rainbowMode) {
       this.somewhereOverTheRainbow()
     }
 
-    this.draw(ctx)
+    this.draw(ctx, hueShiftAmount)
   }
 }

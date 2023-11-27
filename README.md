@@ -4,7 +4,11 @@ A beautiful fireflies simulation made using Canvas API.
 Lovely Fireflies that flicker in the sky.
 
 ## Prerequisites
-You must have Node.js Installed on your Machine
+You must have **Node.js** Installed on your Machine
+<br>
+<br>
+Don't have node intalled? You can download it from official node.js website [official Node.js website](https://pages.github.com/).
+
 
 ## Getting Started
 1. Open terminal and type 

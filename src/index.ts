@@ -121,12 +121,6 @@ const addCanvas = (
         if (hueShiftMode === "onVerticalMousePosition") {
           hueShiftAmount = (y * 360) / canvasSize.height
         }
-
-        // finally:
-        fireflies.forEach(firefly => {
-          firefly.config.colorValue.h =
-            hueShiftAmount + firefly.config.colorValue.h
-        })
       })
     }
 
@@ -171,7 +165,7 @@ const addCanvas = (
     ctx.fillRect(0, 0, canvasSize.width, canvasSize.height)
 
     // Fireflies
-    fireflies.forEach(firefly => firefly.update(ctx))
+    fireflies.forEach(firefly => firefly.update(ctx, hueShiftAmount))
 
     // requestAnimationFrame causes the browser to call the function again and again
     requestAnimationFrame(render)

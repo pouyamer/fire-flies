@@ -9,62 +9,57 @@ const config: IConfig = {
     a: 1
   },
   fireflies: {
-    number: 120,
+    number: 100,
 
     speedX: {
-      min: -1,
-      max: 1
+      min: -2,
+      max: 3
     },
     speedY: {
-      min: 0,
+      min: -1,
       max: 0
     },
-    accelerationX: 0.0,
-    accelerationY: 10 / 60,
+
+    accelerationX: 0,
+    accelerationY: 0,
     accelerateInCurrentMovingDirection: false,
 
-    size: {
-      min: 12,
-      max: 35
+    jitterCoefficientX: {
+      min: 0,
+      max: 2
+    },
+    jitterCoefficientY: {
+      min: 0,
+      max: 2
     },
 
-    coloringMode: "randomHslColor",
+    size: {
+      min: 3,
+      max: 7
+    },
+
+    coloringMode: "singleColor",
 
     singleColorValue: {
-      h: 200,
-      s: 100,
-      l: 100,
+      h: 75,
+      s: 85,
+      l: 75,
       a: 1
     },
 
     hueRangeSpecification: {
-      h: {
-        min: 100,
-        max: 200
-      },
-      s: 100,
-      l: 70,
-      a: 1
+      min: 100,
+      max: 200
     },
 
     saturationRangeSpecification: {
-      h: 220,
-      s: {
-        min: 20,
-        max: 100
-      },
-      l: 65,
-      a: 1
+      min: 20,
+      max: 100
     },
 
     lightnessRangeSpecification: {
-      h: 220,
-      s: 100,
-      l: {
-        min: 60,
-        max: 100
-      },
-      a: 1
+      min: 60,
+      max: 100
     },
 
     hslColorRangeSpecification: {
@@ -121,40 +116,39 @@ const config: IConfig = {
       }
     ],
 
-    opacityDecay: {
+    fadeRate: {
       min: 0.01,
-      max: 0.03
+      max: 0.04
     },
 
-    resetDecayAmountWhenFaded: false,
-    resetColorWhenFaded: true,
-    randomOpacityWhenFaded: true,
-    resetSizeWhenFaded: true,
+    resetColorAfterFade: true,
+    resetSizeAfterFade: true,
+    resetFadeRateAfterFade: true,
 
-    outOfBoundsPositioningBehaviour: "none",
+    outOfBoundsPositioningBehaviour: "continueOnOtherSide",
     fadePositioningBehaviour: "restartAtRandomPosition",
 
-    resetSpeedWhenOutOfBounds: true,
+    resetSpeedsAfterOutOfBounds: true,
 
-    outOfBoundsRestartPosition: {
+    newPositionAfterOutOfBounds: {
       x: 0,
       y: -10
     },
-    fadeRestartPosition: {
+    newPositionAfterFade: {
       x: innerWidth / 2,
       y: innerHeight
     },
 
-    opacityWhenFaded: {
+    newFadeRateAfterFade: {
       min: 1,
       max: 1
     },
 
-    fadeSizeBehavior: {
+    sizeBehaviourWhenFading: {
       behaviorType: "none",
       frequency: 1
     },
 
-    hueShiftMode: "none"
+    hueShiftMode: "onArrowKeys"
   }
 }

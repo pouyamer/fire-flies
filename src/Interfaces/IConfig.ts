@@ -13,41 +13,35 @@ interface IConfig {
     accelerationY: number
     accelerateInCurrentMovingDirection: boolean
 
+    // Jitter applies so that the directions
+    // gets a bit randomized
+    // 0 is for no jitter
+    jitterCoefficientX: IRange
+    jitterCoefficientY: IRange
+
     number: number // Number of fireflies
     size: IRange
 
     // if true: the size of firefly gets new random value when a firefly opacity reaches zero
-    resetSizeWhenFaded: boolean
+    resetSizeAfterFade: boolean
 
     /* =============================== Coloring Mode ========================================== */
     coloringMode: ColoringModes
 
     // if coloringMode = singleColor
     singleColorValue: IHSLColor
+    // NOTE: for other options,
+    // app gets the rest of the values (h,s,l,a)
+    // from singleColorValue
 
-    // if coloringMode = randomHue
-    hueRangeSpecification: {
-      h: IRange
-      s: number
-      l: number
-      a: number
-    }
+    // hue range for if coloringMode = randomHue
+    hueRangeSpecification: IRange
 
-    // if coloringMode = randomSaturation
-    saturationRangeSpecification: {
-      h: number
-      s: IRange
-      l: number
-      a: number
-    }
+    // saturation range if coloringMode = randomSaturation
+    saturationRangeSpecification: IRange
 
-    // if coloringMode = randomLightness
-    lightnessRangeSpecification: {
-      h: number
-      s: number
-      l: IRange
-      a: number
-    }
+    // lightness range if coloringMode = randomLightness
+    lightnessRangeSpecification: IRange
 
     // if coloringMode = randomHslColor
     hslColorRangeSpecification: {
@@ -68,29 +62,28 @@ interface IConfig {
     }[]
 
     // when faded gets the color again
-    resetColorWhenFaded: boolean
+    resetColorAfterFade: boolean
 
     /* ========================================================================================*/
 
-    // rate of opacity decay
-    opacityDecay: IRange
-    randomOpacityWhenFaded: boolean
-    opacityWhenFaded: IRange
+    // rate (per frame) that a firefly fade (opacity decay)
+    fadeRate: IRange
+    resetFadeRateAfterFade: boolean
+    newFadeRateAfterFade: IRange
 
     // what a firefly do after it gets out of bounds
     outOfBoundsPositioningBehaviour: OutOfBoundsPositioningBehaviours
     // -- position for
     // -- if afterOutOfBoundBehavior = restartAtSetPosition
-    outOfBoundsRestartPosition: {
+    newPositionAfterOutOfBounds: {
       x: number
       y: number
     }
 
-    resetSpeedWhenOutOfBounds: boolean
+    resetSpeedsAfterOutOfBounds: boolean
 
     // if true: the decayAmount gets new random value when a firefly opacity reaches zero
-    resetDecayAmountWhenFaded: boolean
-    fadeSizeBehavior: {
+    sizeBehaviourWhenFading: {
       behaviorType: FadeSizeBehavior
       frequency: number
     }
@@ -98,7 +91,7 @@ interface IConfig {
     // it determines what new position fireflies have
     // after fading
     fadePositioningBehaviour: FadePositioningBehaviours
-    fadeRestartPosition: {
+    newPositionAfterFade: {
       x: number
       y: number
     }

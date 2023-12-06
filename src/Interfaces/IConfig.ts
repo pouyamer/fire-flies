@@ -26,24 +26,42 @@ interface IConfig {
     resetSizeAfterFade: boolean
 
     /* =============================== Coloring Mode ========================================== */
-    coloringMode: ColoringModes
 
-    // if coloringMode = singleColor
+    colorValueUpdate: {
+      mode: ColorValueUpdateModeType
+      // how does the app gets the firefly value
+      // based on the range specification of
+      // different color values (h,s,l,a)
+
+      // -- OnStart
+      startingMehtod: ColorRangeSpecificationStartingModeType
+      // -- OnFade
+      onFadeMethod: ColorDeterminationMethodType
+      // on fade,
+      // how much the value gets inc or dec
+      increasingOrDecreasingOnFade: number
+      // on fade,
+      // when colorValueUpdateMode: randomHslColor
+      // how much all the values gets inc or dec
+      increasingOrDecreasingOnFadeAllValues: IHSLColor
+    }
+
+    // if colorValueUpdateMode = singleColor
     singleColorValue: IHSLColor
     // NOTE: for other options,
     // app gets the rest of the values (h,s,l,a)
     // from singleColorValue
+    // hue range for if colorValueUpdateMode = randomHue
 
-    // hue range for if coloringMode = randomHue
     hueRangeSpecification: IRange
 
-    // saturation range if coloringMode = randomSaturation
+    // saturation range if colorValueUpdateMode = randomSaturation
     saturationRangeSpecification: IRange
 
-    // lightness range if coloringMode = randomLightness
+    // lightness range if colorValueUpdateMode = randomLightness
     lightnessRangeSpecification: IRange
 
-    // if coloringMode = randomHslColor
+    // if colorValueUpdateMode = randomHslColor
     hslColorRangeSpecification: {
       h: IRange
       s: IRange
@@ -51,7 +69,7 @@ interface IConfig {
       a: IRange
     }
 
-    // if coloringMode = randomHslColor
+    // if colorValueUpdateMode = randomHslColor
     // an array of selectable colors
     // selection weights get summed and based on
     // chance = (selectionWeight / sum)

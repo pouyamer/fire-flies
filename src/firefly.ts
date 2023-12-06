@@ -7,6 +7,11 @@ class FireFly {
   x: number
   y: number
 
+  // this is used when nothing is initializedYet
+  initializedConfig: ISingleFireflyConfig
+
+  indexForMultipleColorValues: number
+
   utilGetRandomNumberBetween = (
     range: IRange,
     getAsInteger: boolean = false
@@ -20,6 +25,7 @@ class FireFly {
     this.x = x
     this.y = y
     this.appConfig = appConfig
+    this.indexForMultipleColorValues = 0
 
     // getting range values
     const firefliesConfig = appConfig.fireflies
@@ -32,15 +38,41 @@ class FireFly {
       jitterCoefficientY
     } = firefliesConfig
 
+    this.initializedConfig = {
+      colorValue: {
+        h: 0,
+        s: 0,
+        l: 0,
+        a: 0
+      },
+      fadeRate: 0,
+      jitterX: 0,
+      jitterY: 0,
+      opacity: 0,
+      size: 0,
+      sizeBehaviourWhenFading: "none",
+      speedX: 0,
+      speedY: 0,
+      willChangeSize: false
+    }
+
+    this.config = this.initializedConfig
+
     this.config = {
-      colorValue: this.determineColor(firefliesConfig.coloringMode),
+      colorValue: this.determineColor(
+        firefliesConfig.colorValueUpdate.mode,
+        this.appConfig.fireflies.colorValueUpdate.startingMehtod
+      ),
       jitterX: this.utilGetRandomNumberBetween(jitterCoefficientX),
       jitterY: this.utilGetRandomNumberBetween(jitterCoefficientY),
       sizeBehaviourWhenFading:
         Math.random() < firefliesConfig.sizeBehaviourWhenFading.frequency
           ? firefliesConfig.sizeBehaviourWhenFading.behaviorType
           : "none",
-      opacity: this.determineColor(firefliesConfig.coloringMode).a,
+      opacity: this.determineColor(
+        firefliesConfig.colorValueUpdate.mode,
+        this.appConfig.fireflies.colorValueUpdate.startingMehtod
+      ).a,
       fadeRate: this.utilGetRandomNumberBetween(fadeRate),
       // size gets randomized based on your config
       size: this.utilGetRandomNumberBetween(size),
@@ -65,7 +97,37 @@ class FireFly {
     this.rainbowMode = this.appConfig.rainbowMode
   }
 
-  determineColor = (coloringMode: ColoringModes): IHSLColor => {
+  getDeterminatedValue = (
+    current: number,
+    specification: IRange,
+    determinationMethod: ColorDeterminationMethodType,
+    increasingOrDecreasingAmount: number = 0
+  ) => {
+    console.log(determinationMethod)
+    switch (determinationMethod) {
+      case "min":
+        return specification.min
+      case "max":
+        return specification.min
+      case "random":
+        return this.utilGetRandomNumberBetween(specification)
+      case "increasing":
+        return current + increasingOrDecreasingAmount > specification.max
+          ? specification.min
+          : current + increasingOrDecreasingAmount
+      case "decreasing":
+        return current - increasingOrDecreasingAmount < specification.min
+          ? specification.max
+          : current - increasingOrDecreasingAmount
+      default:
+        return 2
+    }
+  }
+
+  determineColor = (
+    coloringMode: ColorValueUpdateModeType,
+    determinationMethod: ColorDeterminationMethodType = "random"
+  ): IHSLColor => {
     const { fireflies: firefliesConfig } = this.appConfig
     const {
       singleColorValue,
@@ -74,67 +136,137 @@ class FireFly {
       lightnessRangeSpecification
     } = firefliesConfig
 
+    const { increasingOrDecreasingOnFade } =
+      this.appConfig.fireflies.colorValueUpdate
+
     switch (coloringMode) {
       case "singleColor":
-        return {
-          ...firefliesConfig.singleColorValue,
+        return firefliesConfig.singleColorValue
 
-          h: firefliesConfig.singleColorValue.h
-        }
-
-      case "randomHue":
+      case "updatingHue":
         return {
           ...singleColorValue,
-          h: this.utilGetRandomNumberBetween(hueRangeSpecification)
+          h: this.getDeterminatedValue(
+            this.config.colorValue.h,
+            hueRangeSpecification,
+            determinationMethod,
+            increasingOrDecreasingOnFade
+          )
         }
 
-      case "randomSaturation":
+      case "updatingSaturation":
         return {
           ...singleColorValue,
-          s: this.utilGetRandomNumberBetween(saturationRangeSpecification)
+          s: this.getDeterminatedValue(
+            this.config.colorValue.s,
+            saturationRangeSpecification,
+            determinationMethod,
+            increasingOrDecreasingOnFade
+          )
         }
 
-      case "randomLightness":
+      case "updatingLightness":
         return {
           ...singleColorValue,
-          l: this.utilGetRandomNumberBetween(lightnessRangeSpecification)
+          l: this.getDeterminatedValue(
+            this.config.colorValue.l,
+            lightnessRangeSpecification,
+            determinationMethod,
+            increasingOrDecreasingOnFade
+          )
         }
 
-      case "randomHslColor":
+      case "updatingHslColor":
         const {
           h: hueRSpec,
           s: saturationRSpec,
           l: lightnessRSpec,
           a: alphaRSpec
         } = firefliesConfig.hslColorRangeSpecification
+        const {
+          h: hueIncOrDec,
+          s: saturationIncOrDec,
+          l: lightnessIncOrDec,
+          a: alphaIncOrDec
+        } = firefliesConfig.colorValueUpdate
+          .increasingOrDecreasingOnFadeAllValues
 
         return {
-          h: this.utilGetRandomNumberBetween(hueRSpec),
-          s: this.utilGetRandomNumberBetween(saturationRSpec),
-          l: this.utilGetRandomNumberBetween(lightnessRSpec),
-          a: this.utilGetRandomNumberBetween(alphaRSpec)
+          h: this.getDeterminatedValue(
+            this.config.colorValue.h,
+            hueRSpec,
+            determinationMethod,
+            hueIncOrDec
+          ),
+          s: this.getDeterminatedValue(
+            this.config.colorValue.s,
+            saturationRSpec,
+            determinationMethod,
+            saturationIncOrDec
+          ),
+          l: this.getDeterminatedValue(
+            this.config.colorValue.l,
+            lightnessRSpec,
+            determinationMethod,
+            lightnessIncOrDec
+          ),
+          a: this.getDeterminatedValue(
+            this.config.colorValue.a,
+            alphaRSpec,
+            determinationMethod,
+            alphaIncOrDec
+          )
         }
 
       case "multipleColorValues":
         const { weightedColorChoices } = firefliesConfig
-        let cumulativeWeights = [weightedColorChoices[0].selectionWeight]
-        for (let i = 1; i < weightedColorChoices.length; i++) {
-          cumulativeWeights[i] =
-            weightedColorChoices[i].selectionWeight + cumulativeWeights[i - 1]
+
+        const minIndex = 0
+        const maxIndex = weightedColorChoices.length - 1
+
+        if (determinationMethod === "random") {
+          let cumulativeWeights = [weightedColorChoices[0].selectionWeight]
+          for (let i = 1; i < weightedColorChoices.length; i++) {
+            cumulativeWeights[i] =
+              weightedColorChoices[i].selectionWeight + cumulativeWeights[i - 1]
+          }
+
+          // Generate a random number between 0 and the sum of weights
+          let random =
+            Math.random() * cumulativeWeights[cumulativeWeights.length - 1]
+
+          // Find the first weight that's greater than or equal to the random number
+          let i = 0
+          while (cumulativeWeights[i] < random) {
+            i++
+          }
+
+          // Return the corresponding color
+          return weightedColorChoices[i].value
         }
 
-        // Generate a random number between 0 and the sum of weights
-        let random =
-          Math.random() * cumulativeWeights[cumulativeWeights.length - 1]
-
-        // Find the first weight that's greater than or equal to the random number
-        let i = 0
-        while (cumulativeWeights[i] < random) {
-          i++
+        if (determinationMethod === "min") {
+          return weightedColorChoices[minIndex].value
         }
+        if (determinationMethod === "max") {
+          return weightedColorChoices[maxIndex].value
+        }
+        if (
+          determinationMethod === "increasing" ||
+          determinationMethod === "decreasing"
+        ) {
+          this.indexForMultipleColorValues = this.getDeterminatedValue(
+            this.indexForMultipleColorValues,
+            {
+              min: minIndex,
+              max: maxIndex
+            },
+            determinationMethod,
+            1
+          )
 
-        // Return the corresponding color
-        return weightedColorChoices[i].value
+          return weightedColorChoices[this.indexForMultipleColorValues].value
+        }
 
       default:
         throw new Error("Invalid Coloring Mode")
@@ -144,6 +276,7 @@ class FireFly {
   draw = (ctx: CanvasRenderingContext2D, hueShiftAmount: number = 0) => {
     ctx.beginPath()
     ctx.arc(this.x, this.y, this.config.size, 0, 2 * Math.PI)
+    ctx.moveTo(this.x, this.y)
     ctx.fillStyle = hslStringify(
       this.config.colorValue.h + hueShiftAmount,
       this.config.colorValue.s,
@@ -200,7 +333,11 @@ class FireFly {
     }
 
     if (resetColorAfterFade) {
-      this.determineColor(this.appConfig.fireflies.coloringMode)
+      console.log(this.config.colorValue.s)
+      this.config.colorValue = this.determineColor(
+        this.appConfig.fireflies.colorValueUpdate.mode,
+        this.appConfig.fireflies.colorValueUpdate.onFadeMethod
+      )
     }
 
     this.handleFadePositioning(
@@ -265,8 +402,6 @@ class FireFly {
       isOutOfBoundsFromRight ||
       isOutOfBoundsFromTop ||
       isOutOfBoundsFromBottom
-
-    isOutOfBounds && console.log(this.x, this.y)
 
     if (isOutOfBounds && this.appConfig.fireflies.resetSpeedsAfterOutOfBounds) {
       this.resetSpeeds()

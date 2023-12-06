@@ -9,15 +9,15 @@ const config: IConfig = {
     a: 1
   },
   fireflies: {
-    number: 100,
+    number: 300,
 
     speedX: {
-      min: -2,
-      max: 3
+      min: 0,
+      max: 0
     },
     speedY: {
-      min: -1,
-      max: 0
+      min: 0,
+      max: 2
     },
 
     accelerationX: 0,
@@ -26,19 +26,30 @@ const config: IConfig = {
 
     jitterCoefficientX: {
       min: 0,
-      max: 2
+      max: 1
     },
     jitterCoefficientY: {
       min: 0,
-      max: 2
+      max: 1
     },
 
     size: {
-      min: 3,
-      max: 7
+      min: 5,
+      max: 10
     },
 
-    coloringMode: "singleColor",
+    colorValueUpdate: {
+      mode: "updatingHue",
+      startingMehtod: "min",
+      onFadeMethod: "increasing",
+      increasingOrDecreasingOnFade: 2,
+      increasingOrDecreasingOnFadeAllValues: {
+        h: 50,
+        s: 5,
+        l: 4,
+        a: 0
+      }
+    },
 
     singleColorValue: {
       h: 75,
@@ -48,23 +59,23 @@ const config: IConfig = {
     },
 
     hueRangeSpecification: {
-      min: 100,
-      max: 200
+      min: 0,
+      max: 360
     },
 
     saturationRangeSpecification: {
-      min: 20,
-      max: 100
+      min: 30,
+      max: 90
     },
 
     lightnessRangeSpecification: {
-      min: 60,
-      max: 100
+      min: 50,
+      max: 85
     },
 
     hslColorRangeSpecification: {
       h: {
-        min: 180,
+        min: 0,
         max: 140
       },
       s: {
@@ -72,8 +83,8 @@ const config: IConfig = {
         max: 100
       },
       l: {
-        min: 20,
-        max: 50
+        min: 50,
+        max: 100
       },
       a: {
         min: 0,
@@ -107,6 +118,16 @@ const config: IConfig = {
       // color 3:
       {
         value: {
+          h: 50,
+          s: 100,
+          l: 70,
+          a: 1
+        },
+        selectionWeight: 1
+      },
+      // color 4:
+      {
+        value: {
           h: 120,
           s: 100,
           l: 70,
@@ -117,18 +138,18 @@ const config: IConfig = {
     ],
 
     fadeRate: {
-      min: 0.01,
-      max: 0.04
+      min: 0.001,
+      max: 0.003
     },
 
     resetColorAfterFade: true,
-    resetSizeAfterFade: true,
+    resetSizeAfterFade: false,
     resetFadeRateAfterFade: true,
 
-    outOfBoundsPositioningBehaviour: "continueOnOtherSide",
-    fadePositioningBehaviour: "restartAtRandomPosition",
+    outOfBoundsPositioningBehaviour: "forceFade",
+    fadePositioningBehaviour: "restartAtRandomXPosition",
 
-    resetSpeedsAfterOutOfBounds: true,
+    resetSpeedsAfterOutOfBounds: false,
 
     newPositionAfterOutOfBounds: {
       x: 0,
@@ -136,7 +157,7 @@ const config: IConfig = {
     },
     newPositionAfterFade: {
       x: innerWidth / 2,
-      y: innerHeight
+      y: 0
     },
 
     newFadeRateAfterFade: {

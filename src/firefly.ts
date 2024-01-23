@@ -17,8 +17,9 @@ class FireFly {
     getAsInteger: boolean = false
   ) => {
     const { min, max } = range
-    if (getAsInteger) return Math.floor(Math.random() * (max - min) + min)
-    return Math.random() * (max - min) + min
+    return getAsInteger
+      ? Math.floor(Math.random() * (max - min) + min)
+      : Math.random() * (max - min) + min
   }
 
   constructor(x: number, y: number, appConfig: IConfig) {
@@ -35,7 +36,9 @@ class FireFly {
       speedY,
       fadeRate,
       jitterCoefficientX,
-      jitterCoefficientY
+      jitterCoefficientY,
+      accelerationX,
+      accelerationY
     } = firefliesConfig
 
     this.initializedConfig = {
@@ -53,12 +56,16 @@ class FireFly {
       sizeBehaviourWhenFading: "none",
       speedX: 0,
       speedY: 0,
-      willChangeSize: false
+      willChangeSize: false,
+      accelerationX: 0,
+      accelerationY: 0
     }
 
     this.config = this.initializedConfig
 
     this.config = {
+      accelerationX: this.utilGetRandomNumberBetween(accelerationX),
+      accelerationY: this.utilGetRandomNumberBetween(accelerationY),
       colorValue: this.determineColor(
         firefliesConfig.colorValueUpdate.mode,
         this.appConfig.fireflies.colorValueUpdate.startingMehtod
@@ -103,7 +110,6 @@ class FireFly {
     determinationMethod: ColorDeterminationMethodType,
     increasingOrDecreasingAmount: number = 0
   ) => {
-    console.log(determinationMethod)
     switch (determinationMethod) {
       case "min":
         return specification.min
@@ -333,7 +339,6 @@ class FireFly {
     }
 
     if (resetColorAfterFade) {
-      console.log(this.config.colorValue.s)
       this.config.colorValue = this.determineColor(
         this.appConfig.fireflies.colorValueUpdate.mode,
         this.appConfig.fireflies.colorValueUpdate.onFadeMethod
@@ -348,6 +353,13 @@ class FireFly {
     this.config.opacity = this.appConfig.fireflies.resetFadeRateAfterFade
       ? this.utilGetRandomNumberBetween(newFadeRateAfterFade)
       : this.originalConfig.opacity
+
+    this.config.accelerationX = this.utilGetRandomNumberBetween(
+      this.appConfig.fireflies.accelerationX
+    )
+    this.config.accelerationY = this.utilGetRandomNumberBetween(
+      this.appConfig.fireflies.accelerationY
+    )
   }
 
   somewhereOverTheRainbow = () => {
@@ -389,13 +401,40 @@ class FireFly {
   handleOutOfBoundsPositioning = (
     behaviour: OutOfBoundsPositioningBehaviours
   ) => {
-    const { newPositionAfterOutOfBounds } = this.appConfig.fireflies
+    const { newPositionAfterOutOfBounds, stopAtBound: stopAtBoundConfig } =
+      this.appConfig.fireflies
+
+    const {
+      afterImpactSpeedMultiplier: {
+        top: afterImpactSpeedMultiplierTop,
+        right: afterImpactSpeedMultiplierRight,
+        bottom: afterImpactSpeedMultiplierBottom,
+        left: afterImpactSpeedMultiplierLeft
+      },
+      toggleBounds: {
+        top: stopAtBoundTop,
+        right: stopAtBoundRight,
+        bottom: stopAtBoundBottom,
+        left: stopAtBoundLeft
+      },
+      forceFadeWhenOutOfBounds
+    } = stopAtBoundConfig
 
     const { size } = this.config
     const isOutOfBoundsFromLeft = this.x < -size
     const isOutOfBoundsFromRight = this.x > this.canvasSize.width + size
     const isOutOfBoundsFromTop = this.y < -size
     const isOutOfBoundsFromBottom = this.y > this.canvasSize.height + size
+
+    const bottomEdge = this.canvasSize.height - size
+    const topEdge = size
+    const leftEdge = size
+    const rightEdge = this.canvasSize.width - size
+
+    const isOnTopEdge = this.y <= topEdge
+    const isOnBottomEdge = this.y >= bottomEdge
+    const isOnLeftEdge = this.x <= leftEdge
+    const isOnRightEdge = this.x >= rightEdge
 
     const isOutOfBounds =
       isOutOfBoundsFromLeft ||
@@ -458,6 +497,37 @@ class FireFly {
 
       case "none":
         break
+
+      case "stopAtBound":
+        if (isOnBottomEdge && stopAtBoundBottom) {
+          this.y = bottomEdge
+          this.config.speedY =
+            -afterImpactSpeedMultiplierBottom * this.config.speedY
+        }
+
+        if (isOnTopEdge && stopAtBoundTop) {
+          this.y = topEdge
+          this.config.speedY =
+            -afterImpactSpeedMultiplierTop * this.config.speedY
+        }
+
+        if (isOnLeftEdge && stopAtBoundLeft) {
+          this.x = leftEdge
+          this.config.speedX =
+            -afterImpactSpeedMultiplierLeft * this.config.speedX
+        }
+
+        if (isOnRightEdge && stopAtBoundRight) {
+          this.x = rightEdge
+          this.config.speedX =
+            -afterImpactSpeedMultiplierRight * this.config.speedX
+        }
+
+        if (isOutOfBounds) {
+          this.config.opacity = 0
+        }
+
+        break
       default:
         throw new Error("Unknown OutOfBoundPositioningBehaviors")
         break
@@ -471,15 +541,14 @@ class FireFly {
   }
 
   handleAcceleration = () => {
-    const { accelerateInCurrentMovingDirection, accelerationX, accelerationY } =
-      this.appConfig.fireflies
+    const { accelerateInCurrentMovingDirection } = this.appConfig.fireflies
     // increase/decreasing speed of fireflies bt acceleration
     this.config.speedX +=
-      accelerationX *
+      this.config.accelerationX *
       (accelerateInCurrentMovingDirection ? Math.sign(this.config.speedX) : 1)
 
     this.config.speedY +=
-      accelerationY *
+      this.config.accelerationY *
       (accelerateInCurrentMovingDirection ? Math.sign(this.config.speedY) : 1)
   }
 

@@ -2,6 +2,8 @@ interface ISingleFireflyConfig {
   // speed in which firefly moves
   speedX: number
   speedY: number
+  accelerationX: number
+  accelerationY: number
 
   size: number
 

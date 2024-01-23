@@ -13,3 +13,5 @@ type OutOfBoundsPositioningBehaviours =
   // set the fixed x position at config outOfBoundsRestartPosition.x
   | "restartAtRandomYPosition"
   | "restartAtSetPosition"
+  // stop at bound
+  | "stopAtBound"

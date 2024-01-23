@@ -5,43 +5,48 @@ const config: IConfig = {
   skyColor: {
     h: 20,
     s: 75,
-    l: 0,
+    l: 2,
     a: 1
   },
   fireflies: {
-    number: 300,
+    number: 1000,
+    size: {
+      min: 1,
+      max: 20
+    },
 
     speedX: {
+      min: -2,
+      max: 2
+    },
+    speedY: {
+      min: -3,
+      max: 3
+    },
+
+    accelerationX: {
       min: 0,
       max: 0
     },
-    speedY: {
+    accelerationY: {
       min: 0,
-      max: 2
+      max: 0.2
     },
-
-    accelerationX: 0,
-    accelerationY: 0,
     accelerateInCurrentMovingDirection: false,
 
     jitterCoefficientX: {
       min: 0,
-      max: 1
+      max: 0
     },
     jitterCoefficientY: {
       min: 0,
-      max: 1
-    },
-
-    size: {
-      min: 5,
-      max: 10
+      max: 0
     },
 
     colorValueUpdate: {
       mode: "updatingHue",
-      startingMehtod: "min",
-      onFadeMethod: "increasing",
+      startingMehtod: "random",
+      onFadeMethod: "random",
       increasingOrDecreasingOnFade: 2,
       increasingOrDecreasingOnFadeAllValues: {
         h: 50,
@@ -52,15 +57,15 @@ const config: IConfig = {
     },
 
     singleColorValue: {
-      h: 75,
+      h: 40,
       s: 85,
-      l: 75,
+      l: 50,
       a: 1
     },
 
     hueRangeSpecification: {
-      min: 0,
-      max: 360
+      min: 120,
+      max: 240
     },
 
     saturationRangeSpecification: {
@@ -69,25 +74,25 @@ const config: IConfig = {
     },
 
     lightnessRangeSpecification: {
-      min: 50,
-      max: 85
+      min: 10,
+      max: 81
     },
 
     hslColorRangeSpecification: {
       h: {
         min: 0,
-        max: 140
+        max: 60
       },
       s: {
         min: 70,
         max: 100
       },
       l: {
-        min: 50,
-        max: 100
+        min: 20,
+        max: 85
       },
       a: {
-        min: 0,
+        min: 1,
         max: 1
       }
     },
@@ -138,16 +143,34 @@ const config: IConfig = {
     ],
 
     fadeRate: {
-      min: 0.001,
-      max: 0.003
+      min: 0.0,
+      max: 0.001
+      // min: 0,
+      // max: 0
     },
 
     resetColorAfterFade: true,
     resetSizeAfterFade: false,
     resetFadeRateAfterFade: true,
 
-    outOfBoundsPositioningBehaviour: "forceFade",
+    outOfBoundsPositioningBehaviour: "stopAtBound",
     fadePositioningBehaviour: "restartAtRandomXPosition",
+
+    stopAtBound: {
+      forceFadeWhenOutOfBounds: true,
+      toggleBounds: {
+        top: true,
+        right: true,
+        bottom: true,
+        left: true
+      },
+      afterImpactSpeedMultiplier: {
+        top: 1,
+        right: 1,
+        bottom: 0.75,
+        left: 1
+      }
+    },
 
     resetSpeedsAfterOutOfBounds: false,
 
@@ -156,7 +179,7 @@ const config: IConfig = {
       y: -10
     },
     newPositionAfterFade: {
-      x: innerWidth / 2,
+      x: 0,
       y: 0
     },
 

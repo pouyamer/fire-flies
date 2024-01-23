@@ -9,8 +9,8 @@ interface IConfig {
     speedY: IRange
 
     // speed in which firefly's speed increases
-    accelerationX: number
-    accelerationY: number
+    accelerationX: IRange
+    accelerationY: IRange
     accelerateInCurrentMovingDirection: boolean
 
     // Jitter applies so that the directions
@@ -91,6 +91,29 @@ interface IConfig {
 
     // what a firefly do after it gets out of bounds
     outOfBoundsPositioningBehaviour: OutOfBoundsPositioningBehaviours
+
+    // in stopAtBound Mode
+    stopAtBound: {
+      toggleBounds: {
+        top: boolean
+        right: boolean
+        bottom: boolean
+        left: boolean
+      }
+
+      // if true: when a firefly gets out of bounds
+      // due to bound disabling
+      // it gets faded
+      forceFadeWhenOutOfBounds: boolean
+      // how much speed it's going to lose
+      afterImpactSpeedMultiplier: {
+        top: number
+        right: number
+        bottom: number
+        left: number
+      }
+    }
+
     // -- position for
     // -- if afterOutOfBoundBehavior = restartAtSetPosition
     newPositionAfterOutOfBounds: {

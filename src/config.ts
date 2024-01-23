@@ -153,16 +153,15 @@ const config: IConfig = {
     resetSizeAfterFade: false,
     resetFadeRateAfterFade: true,
 
-    outOfBoundsPositioningBehaviour: "stopAtBound",
+    outOfBoundsPositioningBehaviour: "forceFade",
     fadePositioningBehaviour: "restartAtRandomXPosition",
 
-    stopAtBound: {
-      forceFadeWhenOutOfBounds: true,
+    bounds: {
       toggleBounds: {
         top: true,
-        right: true,
+        right: false,
         bottom: true,
-        left: true
+        left: false
       },
       afterImpactSpeedMultiplier: {
         top: 1,

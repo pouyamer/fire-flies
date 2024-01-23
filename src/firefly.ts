@@ -401,7 +401,7 @@ class FireFly {
   handleOutOfBoundsPositioning = (
     behaviour: OutOfBoundsPositioningBehaviours
   ) => {
-    const { newPositionAfterOutOfBounds, stopAtBound: stopAtBoundConfig } =
+    const { newPositionAfterOutOfBounds, bounds: boundsConfig } =
       this.appConfig.fireflies
 
     const {
@@ -416,9 +416,8 @@ class FireFly {
         right: stopAtBoundRight,
         bottom: stopAtBoundBottom,
         left: stopAtBoundLeft
-      },
-      forceFadeWhenOutOfBounds
-    } = stopAtBoundConfig
+      }
+    } = boundsConfig
 
     const { size } = this.config
     const isOutOfBoundsFromLeft = this.x < -size
@@ -444,6 +443,27 @@ class FireFly {
 
     if (isOutOfBounds && this.appConfig.fireflies.resetSpeedsAfterOutOfBounds) {
       this.resetSpeeds()
+    }
+
+    if (isOnBottomEdge && stopAtBoundBottom) {
+      this.y = bottomEdge
+      this.config.speedY =
+        -afterImpactSpeedMultiplierBottom * this.config.speedY
+    }
+
+    if (isOnTopEdge && stopAtBoundTop) {
+      this.y = topEdge
+      this.config.speedY = -afterImpactSpeedMultiplierTop * this.config.speedY
+    }
+
+    if (isOnLeftEdge && stopAtBoundLeft) {
+      this.x = leftEdge
+      this.config.speedX = -afterImpactSpeedMultiplierLeft * this.config.speedX
+    }
+
+    if (isOnRightEdge && stopAtBoundRight) {
+      this.x = rightEdge
+      this.config.speedX = -afterImpactSpeedMultiplierRight * this.config.speedX
     }
 
     switch (behaviour) {
@@ -498,36 +518,6 @@ class FireFly {
       case "none":
         break
 
-      case "stopAtBound":
-        if (isOnBottomEdge && stopAtBoundBottom) {
-          this.y = bottomEdge
-          this.config.speedY =
-            -afterImpactSpeedMultiplierBottom * this.config.speedY
-        }
-
-        if (isOnTopEdge && stopAtBoundTop) {
-          this.y = topEdge
-          this.config.speedY =
-            -afterImpactSpeedMultiplierTop * this.config.speedY
-        }
-
-        if (isOnLeftEdge && stopAtBoundLeft) {
-          this.x = leftEdge
-          this.config.speedX =
-            -afterImpactSpeedMultiplierLeft * this.config.speedX
-        }
-
-        if (isOnRightEdge && stopAtBoundRight) {
-          this.x = rightEdge
-          this.config.speedX =
-            -afterImpactSpeedMultiplierRight * this.config.speedX
-        }
-
-        if (isOutOfBounds) {
-          this.config.opacity = 0
-        }
-
-        break
       default:
         throw new Error("Unknown OutOfBoundPositioningBehaviors")
         break

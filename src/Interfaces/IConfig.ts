@@ -92,8 +92,8 @@ interface IConfig {
     // what a firefly do after it gets out of bounds
     outOfBoundsPositioningBehaviour: OutOfBoundsPositioningBehaviours
 
-    // in stopAtBound Mode
-    stopAtBound: {
+    // bounds behaviour
+    bounds: {
       toggleBounds: {
         top: boolean
         right: boolean
@@ -103,8 +103,7 @@ interface IConfig {
 
       // if true: when a firefly gets out of bounds
       // due to bound disabling
-      // it gets faded
-      forceFadeWhenOutOfBounds: boolean
+
       // how much speed it's going to lose
       afterImpactSpeedMultiplier: {
         top: number

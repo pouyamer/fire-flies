@@ -1,0 +1,1 @@
+type ShapeType = "circle" | "square"

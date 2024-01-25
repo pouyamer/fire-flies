@@ -10,9 +10,10 @@ const config: IConfig = {
   },
   fireflies: {
     number: 1000,
+    shape: "square",
     size: {
-      min: 1,
-      max: 20
+      min: 10,
+      max: 10
     },
 
     speedX: {
@@ -20,8 +21,8 @@ const config: IConfig = {
       max: 2
     },
     speedY: {
-      min: -3,
-      max: 3
+      min: 0,
+      max: 2
     },
 
     accelerationX: {
@@ -30,7 +31,7 @@ const config: IConfig = {
     },
     accelerationY: {
       min: 0,
-      max: 0.2
+      max: 0.1
     },
     accelerateInCurrentMovingDirection: false,
 
@@ -45,8 +46,8 @@ const config: IConfig = {
 
     colorValueUpdate: {
       mode: "updatingHue",
-      startingMehtod: "random",
-      onFadeMethod: "random",
+      startingMehtod: "min",
+      onFadeMethod: "max",
       increasingOrDecreasingOnFade: 2,
       increasingOrDecreasingOnFadeAllValues: {
         h: 50,
@@ -64,8 +65,8 @@ const config: IConfig = {
     },
 
     hueRangeSpecification: {
-      min: 120,
-      max: 240
+      min: 0,
+      max: 360
     },
 
     saturationRangeSpecification: {
@@ -143,8 +144,8 @@ const config: IConfig = {
     ],
 
     fadeRate: {
-      min: 0.0,
-      max: 0.001
+      min: 0,
+      max: 0.1
       // min: 0,
       // max: 0
     },
@@ -158,16 +159,16 @@ const config: IConfig = {
 
     bounds: {
       toggleBounds: {
-        top: true,
-        right: false,
+        top: false,
+        right: true,
         bottom: true,
-        left: false
+        left: true
       },
       afterImpactSpeedMultiplier: {
-        top: 1,
-        right: 1,
+        top: 0.75,
+        right: 0.75,
         bottom: 0.75,
-        left: 1
+        left: 0.75
       }
     },
 

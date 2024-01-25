@@ -48,6 +48,7 @@ class FireFly {
         l: 0,
         a: 0
       },
+      shape: "circle",
       fadeRate: 0,
       jitterX: 0,
       jitterY: 0,
@@ -76,6 +77,7 @@ class FireFly {
         Math.random() < firefliesConfig.sizeBehaviourWhenFading.frequency
           ? firefliesConfig.sizeBehaviourWhenFading.behaviorType
           : "none",
+      shape: firefliesConfig.shape,
       opacity: this.determineColor(
         firefliesConfig.colorValueUpdate.mode,
         this.appConfig.fireflies.colorValueUpdate.startingMehtod
@@ -280,17 +282,25 @@ class FireFly {
   }
 
   draw = (ctx: CanvasRenderingContext2D, hueShiftAmount: number = 0) => {
-    ctx.beginPath()
-    ctx.arc(this.x, this.y, this.config.size, 0, 2 * Math.PI)
-    ctx.moveTo(this.x, this.y)
     ctx.fillStyle = hslStringify(
       this.config.colorValue.h + hueShiftAmount,
       this.config.colorValue.s,
       this.config.colorValue.l,
       this.config.opacity
     )
+    switch (this.config.shape) {
+      case "circle":
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, this.config.size, 0, 2 * Math.PI)
+        ctx.moveTo(this.x, this.y)
 
-    ctx.fill()
+        ctx.fill()
+        return
+      case "square":
+        ctx.fill()
+        ctx.fillRect(this.x, this.y, this.config.size, this.config.size)
+        return
+    }
   }
 
   // handleFade() lowers the opacity of the firefly

@@ -92,6 +92,7 @@ interface IConfig {
     // what a firefly do after it gets out of bounds
     outOfBoundsPositioningBehaviour: OutOfBoundsPositioningBehaviours
 
+    shape: ShapeType
     // bounds behaviour
     bounds: {
       toggleBounds: {

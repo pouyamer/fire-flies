@@ -5,22 +5,22 @@ interface IConfig {
   skyColor: IHSLColor
   fireflies: {
     // speed in which firefly moves
-    speedX: IRange
-    speedY: IRange
+    speedX: RangeType
+    speedY: RangeType
 
     // speed in which firefly's speed increases
-    accelerationX: IRange
-    accelerationY: IRange
+    accelerationX: RangeType
+    accelerationY: RangeType
     accelerateInCurrentMovingDirection: boolean
 
     // Jitter applies so that the directions
     // gets a bit randomized
     // 0 is for no jitter
-    jitterCoefficientX: IRange
-    jitterCoefficientY: IRange
+    jitterCoefficientX: RangeType
+    jitterCoefficientY: RangeType
 
     number: number // Number of fireflies
-    size: IRange
+    size: RangeType
 
     // if true: the size of firefly gets new random value when a firefly opacity reaches zero
     resetSizeAfterFade: boolean
@@ -53,20 +53,20 @@ interface IConfig {
     // from singleColorValue
     // hue range for if colorValueUpdateMode = randomHue
 
-    hueRangeSpecification: IRange
+    hueRangeSpecification: RangeType
 
     // saturation range if colorValueUpdateMode = randomSaturation
-    saturationRangeSpecification: IRange
+    saturationRangeSpecification: RangeType
 
     // lightness range if colorValueUpdateMode = randomLightness
-    lightnessRangeSpecification: IRange
+    lightnessRangeSpecification: RangeType
 
     // if colorValueUpdateMode = randomHslColor
     hslColorRangeSpecification: {
-      h: IRange
-      s: IRange
-      l: IRange
-      a: IRange
+      h: RangeType
+      s: RangeType
+      l: RangeType
+      a: RangeType
     }
 
     // if colorValueUpdateMode = randomHslColor
@@ -85,9 +85,9 @@ interface IConfig {
     /* ========================================================================================*/
 
     // rate (per frame) that a firefly fade (opacity decay)
-    fadeRate: IRange
+    fadeRate: RangeType
     resetFadeRateAfterFade: boolean
-    newFadeRateAfterFade: IRange
+    newFadeRateAfterFade: RangeType
 
     // what a firefly do after it gets out of bounds
     outOfBoundsPositioningBehaviour: OutOfBoundsPositioningBehaviours
@@ -95,23 +95,17 @@ interface IConfig {
     shape: ShapeType
     // bounds behaviour
     bounds: {
-      toggleBounds: {
-        top: boolean
-        right: boolean
-        bottom: boolean
-        left: boolean
-      }
+      toggleBounds: DirectionalBooleanType
 
       // if true: when a firefly gets out of bounds
       // due to bound disabling
 
       // how much speed it's going to lose
-      afterImpactSpeedMultiplier: {
-        top: number
-        right: number
-        bottom: number
-        left: number
-      }
+      afterImpactSpeedMultiplier: DirectionalNumberType
+      // how much hue increases after it touches the bounds
+      hueIncreaseAmountAfterImpact: DirectionalNumberType
+
+      sizeMultiplierAfterImpact: DirectionalNumberType
     }
 
     // -- position for

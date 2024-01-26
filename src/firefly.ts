@@ -13,7 +13,7 @@ class FireFly {
   indexForMultipleColorValues: number
 
   utilGetRandomNumberBetween = (
-    range: IRange,
+    range: RangeType,
     getAsInteger: boolean = false
   ) => {
     const { min, max } = range
@@ -108,7 +108,7 @@ class FireFly {
 
   getDeterminatedValue = (
     current: number,
-    specification: IRange,
+    specification: RangeType,
     determinationMethod: ColorDeterminationMethodType,
     increasingOrDecreasingAmount: number = 0
   ) => {
@@ -149,7 +149,7 @@ class FireFly {
 
     switch (coloringMode) {
       case "singleColor":
-        return firefliesConfig.singleColorValue
+        return { ...firefliesConfig.singleColorValue }
 
       case "updatingHue":
         return {
@@ -291,14 +291,18 @@ class FireFly {
     switch (this.config.shape) {
       case "circle":
         ctx.beginPath()
-        ctx.arc(this.x, this.y, this.config.size, 0, 2 * Math.PI)
+        ctx.arc(this.x, this.y, this.config.size / 2, 0, 2 * Math.PI)
         ctx.moveTo(this.x, this.y)
 
         ctx.fill()
         return
       case "square":
-        ctx.fill()
-        ctx.fillRect(this.x, this.y, this.config.size, this.config.size)
+        ctx.fillRect(
+          this.x - this.config.size / 2,
+          this.y - this.config.size / 2,
+          this.config.size,
+          this.config.size
+        )
         return
     }
   }
@@ -411,8 +415,13 @@ class FireFly {
   handleOutOfBoundsPositioning = (
     behaviour: OutOfBoundsPositioningBehaviours
   ) => {
-    const { newPositionAfterOutOfBounds, bounds: boundsConfig } =
-      this.appConfig.fireflies
+    const {
+      newPositionAfterOutOfBounds,
+      bounds: boundsConfig,
+      colorValueUpdate: { mode: colorValueUpdateMode },
+      hueRangeSpecification: { min: minAllowedHue, max: maxAllowedHue },
+      size: { min: minAllowedSize, max: maxAllowedSize }
+    } = this.appConfig.fireflies
 
     const {
       afterImpactSpeedMultiplier: {
@@ -426,24 +435,69 @@ class FireFly {
         right: stopAtBoundRight,
         bottom: stopAtBoundBottom,
         left: stopAtBoundLeft
+      },
+      hueIncreaseAmountAfterImpact: {
+        top: hueIncreaseAmountAfterImpactTop,
+        right: hueIncreaseAmountAfterImpactRight,
+        bottom: hueIncreaseAmountAfterImpactBottom,
+        left: hueIncreaseAmountAfterImpactLeft
+      },
+      sizeMultiplierAfterImpact: {
+        top: sizeMultiplierAfterImpactTop,
+        right: sizeMultiplierAfterImpactRight,
+        bottom: sizeMultiplierAfterImpactBottom,
+        left: sizeMultiplierAfterImpactLeft
       }
     } = boundsConfig
 
     const { size } = this.config
-    const isOutOfBoundsFromLeft = this.x < -size
-    const isOutOfBoundsFromRight = this.x > this.canvasSize.width + size
-    const isOutOfBoundsFromTop = this.y < -size
-    const isOutOfBoundsFromBottom = this.y > this.canvasSize.height + size
 
-    const bottomEdge = this.canvasSize.height - size
-    const topEdge = size
-    const leftEdge = size
-    const rightEdge = this.canvasSize.width - size
+    const increaseHueAfterImpact = (amount: number) => {
+      this.config.colorValue.h += amount
 
-    const isOnTopEdge = this.y <= topEdge
-    const isOnBottomEdge = this.y >= bottomEdge
-    const isOnLeftEdge = this.x <= leftEdge
-    const isOnRightEdge = this.x >= rightEdge
+      if (colorValueUpdateMode === "singleColor") {
+        return
+      }
+
+      if (this.config.colorValue.h > maxAllowedHue) {
+        this.config.colorValue.h = minAllowedHue
+        return
+      }
+
+      if (this.config.colorValue.h < minAllowedHue) {
+        this.config.colorValue.h = maxAllowedHue
+        return
+      }
+    }
+
+    const changeSizeAfterImpact = (multiplier: number) => {
+      this.config.size = Math.ceil(multiplier * this.config.size)
+
+      if (this.config.size < minAllowedSize) {
+        this.config.size = maxAllowedSize
+        return
+      }
+
+      if (this.config.size > maxAllowedSize) {
+        this.config.size = minAllowedSize
+        return
+      }
+    }
+
+    const isOutOfBoundsFromLeft = this.x < -size / 2
+    const isOutOfBoundsFromRight = this.x > this.canvasSize.width + size / 2
+    const isOutOfBoundsFromTop = this.y < -size / 2
+    const isOutOfBoundsFromBottom = this.y > this.canvasSize.height + size / 2
+
+    const bottomEdge = this.canvasSize.height - size / 2
+    const topEdge = size / 2
+    const leftEdge = size / 2
+    const rightEdge = this.canvasSize.width - size / 2
+
+    const isOnTopEdge = this.y < topEdge
+    const isOnBottomEdge = this.y > bottomEdge
+    const isOnLeftEdge = this.x < leftEdge
+    const isOnRightEdge = this.x > rightEdge
 
     const isOutOfBounds =
       isOutOfBoundsFromLeft ||
@@ -456,24 +510,46 @@ class FireFly {
     }
 
     if (isOnBottomEdge && stopAtBoundBottom) {
+      // ensure the position after the impact
       this.y = bottomEdge
+
+      // impact decreases the speed and switches the directions
       this.config.speedY =
         -afterImpactSpeedMultiplierBottom * this.config.speedY
+
+      // impact increases/decreases the hue
+      increaseHueAfterImpact(hueIncreaseAmountAfterImpactBottom)
+
+      // impact causes fireflies to shrink/grow
+      changeSizeAfterImpact(sizeMultiplierAfterImpactBottom)
+      return
     }
 
     if (isOnTopEdge && stopAtBoundTop) {
       this.y = topEdge
       this.config.speedY = -afterImpactSpeedMultiplierTop * this.config.speedY
+      increaseHueAfterImpact(hueIncreaseAmountAfterImpactTop)
+      changeSizeAfterImpact(sizeMultiplierAfterImpactTop)
+
+      return
     }
 
     if (isOnLeftEdge && stopAtBoundLeft) {
       this.x = leftEdge
       this.config.speedX = -afterImpactSpeedMultiplierLeft * this.config.speedX
+      increaseHueAfterImpact(hueIncreaseAmountAfterImpactLeft)
+      changeSizeAfterImpact(sizeMultiplierAfterImpactLeft)
+
+      return
     }
 
     if (isOnRightEdge && stopAtBoundRight) {
       this.x = rightEdge
       this.config.speedX = -afterImpactSpeedMultiplierRight * this.config.speedX
+      increaseHueAfterImpact(hueIncreaseAmountAfterImpactRight)
+      changeSizeAfterImpact(sizeMultiplierAfterImpactRight)
+
+      return
     }
 
     switch (behaviour) {
@@ -484,10 +560,22 @@ class FireFly {
         break
       case "continueOnOtherSide":
         // --  reset the speed after going out of bounds
-        if (isOutOfBoundsFromLeft) this.x = this.canvasSize.width + size
-        if (isOutOfBoundsFromRight) this.x = -size
-        if (isOutOfBoundsFromTop) this.y = this.canvasSize.height + size
-        if (isOutOfBoundsFromBottom) this.y = -size
+        if (isOutOfBoundsFromLeft) {
+          this.x = this.canvasSize.width + size / 2
+          return
+        }
+        if (isOutOfBoundsFromRight) {
+          this.x = -size / 2
+          return
+        }
+        if (isOutOfBoundsFromTop) {
+          this.y = this.canvasSize.height + size / 2
+          return
+        }
+        if (isOutOfBoundsFromBottom) {
+          this.y = -size / 2
+          return
+        }
         break
 
       case "restartAtRandomPosition":

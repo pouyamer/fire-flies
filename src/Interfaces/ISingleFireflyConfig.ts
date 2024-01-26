@@ -13,12 +13,13 @@ interface ISingleFireflyConfig {
 
   /* ========================================================================================*/
 
-  // rate of opacity decay
   opacity: number
-  fadeRate: number
+  fadeOrGlow: FadeOrGlowType
+  // rate of opacity inc or dec
+  fadeOrGlowRate: number
 
-  sizeBehaviourWhenFading: FadeSizeBehavior
-  willChangeSize: boolean
+  sizeBehaviourWhenFading: FadeOrGlowSizeBehaviorType
+  sizeBehaviourWhenGlowing: FadeOrGlowSizeBehaviorType
 
   jitterX: number
   jitterY: number

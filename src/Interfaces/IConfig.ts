@@ -22,9 +22,56 @@ interface IConfig {
     number: number // Number of fireflies
     size: RangeType
 
-    // if true: the size of firefly gets new random value when a firefly opacity reaches zero
-    resetSizeAfterFade: boolean
+    // how many is going to glow otherwise fade
+    fadeRatio: number
 
+    fade: {
+      // rate (per frame) that a firefly fade (opacity decay)
+      rate: RangeType
+      resetRateAfterFade: boolean
+      newRateAfterFade: RangeType
+      // if true: the size of firefly gets new random value when a firefly opacity reaches zero
+      resetSizeAfterFade: boolean
+
+      // when faded gets the color again
+      resetColorAfterFade: boolean
+
+      // it determines what new position fireflies have
+      // after fading
+      positioningBehaviour: FadeOrGlowPositioningBehaviourType
+      sizeChangeBehaviour: {
+        behaviorType: FadeOrGlowSizeBehaviorType
+        frequency: number
+      }
+      newPositionAfterFade: {
+        x: number
+        y: number
+      }
+    }
+
+    glow: {
+      // rate (per frame) that a firefly glow (opacity increase)
+      rate: RangeType
+      resetRateAfterGlow: boolean
+      newRateAfterGlow: RangeType
+      // if true: the size of firefly gets new random value when a firefly opacity reaches 1
+      resetSizeAfterGlow: boolean
+
+      // when Glown gets the color again
+      resetColorAfterGlow: boolean
+
+      // it determines what new position fireflies have
+      // after fading
+      positioningBehaviour: FadeOrGlowPositioningBehaviourType
+      sizeChangeBehaviour: {
+        behaviorType: FadeOrGlowSizeBehaviorType
+        frequency: number
+      }
+      newPositionAfterGlow: {
+        x: number
+        y: number
+      }
+    }
     /* =============================== Coloring Mode ========================================== */
 
     colorValueUpdate: {
@@ -79,15 +126,7 @@ interface IConfig {
       selectionWeight: number
     }[]
 
-    // when faded gets the color again
-    resetColorAfterFade: boolean
-
     /* ========================================================================================*/
-
-    // rate (per frame) that a firefly fade (opacity decay)
-    fadeRate: RangeType
-    resetFadeRateAfterFade: boolean
-    newFadeRateAfterFade: RangeType
 
     // what a firefly do after it gets out of bounds
     outOfBoundsPositioningBehaviour: OutOfBoundsPositioningBehaviours
@@ -118,18 +157,7 @@ interface IConfig {
     resetSpeedsAfterOutOfBounds: boolean
 
     // if true: the decayAmount gets new random value when a firefly opacity reaches zero
-    sizeBehaviourWhenFading: {
-      behaviorType: FadeSizeBehavior
-      frequency: number
-    }
 
-    // it determines what new position fireflies have
-    // after fading
-    fadePositioningBehaviour: FadePositioningBehaviours
-    newPositionAfterFade: {
-      x: number
-      y: number
-    }
     hueShiftMode: HueShiftModes
   }
 }

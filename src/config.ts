@@ -5,24 +5,24 @@ const config: IConfig = {
   skyColor: {
     h: 20,
     s: 75,
-    l: 2,
+    l: 0,
     a: 1
   },
   fireflies: {
-    number: 200,
+    number: 100,
     shape: "circle",
     size: {
-      min: 1,
-      max: 100
+      min: 4,
+      max: 20
     },
 
     speedX: {
-      min: -5,
-      max: 5
+      min: -2,
+      max: 2
     },
     speedY: {
-      min: -5,
-      max: 5
+      min: -2,
+      max: 2
     },
 
     accelerationX: {
@@ -36,19 +36,69 @@ const config: IConfig = {
     accelerateInCurrentMovingDirection: false,
 
     jitterCoefficientX: {
-      min: 0,
-      max: 0
+      min: -1,
+      max: 1
     },
     jitterCoefficientY: {
-      min: 0,
-      max: 0
+      min: -1,
+      max: 1
+    },
+    fadeRatio: 1,
+
+    fade: {
+      rate: {
+        min: 0.005,
+        max: 0.01
+      },
+
+      // TODO: change this to new opacity after fade (and grow)
+      // TODO: Refactor the code
+      newRateAfterFade: {
+        min: 1,
+        max: 1
+      },
+      newPositionAfterFade: {
+        x: 0,
+        y: 0
+      },
+      positioningBehaviour: "restartAtRandomPosition",
+      resetColorAfterFade: true,
+      resetRateAfterFade: true,
+      resetSizeAfterFade: false,
+      sizeChangeBehaviour: {
+        behaviorType: "none",
+        frequency: 1
+      }
     },
 
+    glow: {
+      rate: {
+        min: 0.003,
+        max: 0.012
+      },
+
+      newRateAfterGlow: {
+        min: 0,
+        max: 0
+      },
+      newPositionAfterGlow: {
+        x: 0,
+        y: 0
+      },
+      positioningBehaviour: "restartAtRandomPosition",
+      resetColorAfterGlow: true,
+      resetRateAfterGlow: true,
+      resetSizeAfterGlow: false,
+      sizeChangeBehaviour: {
+        behaviorType: "none",
+        frequency: 1
+      }
+    },
     colorValueUpdate: {
-      mode: "singleColor",
-      startingMehtod: "min",
-      onFadeMethod: "max",
-      increasingOrDecreasingOnFade: 2,
+      mode: "updatingHue",
+      startingMehtod: "max",
+      onFadeMethod: "decreasing",
+      increasingOrDecreasingOnFade: 10,
       increasingOrDecreasingOnFadeAllValues: {
         h: 50,
         s: 5,
@@ -60,13 +110,13 @@ const config: IConfig = {
     singleColorValue: {
       h: 40,
       s: 85,
-      l: 50,
+      l: 65,
       a: 1
     },
 
     hueRangeSpecification: {
-      min: 0,
-      max: 100
+      min: 20,
+      max: 50
     },
 
     saturationRangeSpecification: {
@@ -143,26 +193,14 @@ const config: IConfig = {
       }
     ],
 
-    fadeRate: {
-      min: 0,
-      max: 0
-      // min: 0,
-      // max: 0
-    },
-
-    resetColorAfterFade: true,
-    resetSizeAfterFade: false,
-    resetFadeRateAfterFade: true,
-
-    outOfBoundsPositioningBehaviour: "continueOnOtherSide",
-    fadePositioningBehaviour: "none",
+    outOfBoundsPositioningBehaviour: "forceFade",
 
     bounds: {
       toggleBounds: {
         top: true,
-        right: true,
+        right: false,
         bottom: true,
-        left: true
+        left: false
       },
       afterImpactSpeedMultiplier: {
         top: 1,
@@ -177,10 +215,10 @@ const config: IConfig = {
         bottom: 1
       },
       sizeMultiplierAfterImpact: {
-        top: 0.95,
-        right: 0.95,
-        bottom: 0.95,
-        left: 0.95
+        top: 1,
+        right: 1,
+        bottom: 1,
+        left: 1
       }
     },
 
@@ -189,20 +227,6 @@ const config: IConfig = {
     newPositionAfterOutOfBounds: {
       x: 0,
       y: -10
-    },
-    newPositionAfterFade: {
-      x: 0,
-      y: 0
-    },
-
-    newFadeRateAfterFade: {
-      min: 1,
-      max: 1
-    },
-
-    sizeBehaviourWhenFading: {
-      behaviorType: "none",
-      frequency: 1
     },
 
     hueShiftMode: "onArrowKeys"

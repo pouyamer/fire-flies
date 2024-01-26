@@ -1,0 +1,1 @@
+type FadeOrGlowType = "fade" | "glow"

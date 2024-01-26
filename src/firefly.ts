@@ -34,7 +34,9 @@ class FireFly {
       size,
       speedX,
       speedY,
-      fadeRate,
+      fadeRatio,
+      fade: { rate: fadeRate, sizeChangeBehaviour: fadeSizeChangeBehaviour },
+      glow: { rate: glowRate, sizeChangeBehaviour: glowSizeChangeBehaviour },
       jitterCoefficientX,
       jitterCoefficientY,
       accelerationX,
@@ -49,20 +51,24 @@ class FireFly {
         a: 0
       },
       shape: "circle",
-      fadeRate: 0,
+      fadeOrGlow: "fade",
+      fadeOrGlowRate: 0,
       jitterX: 0,
       jitterY: 0,
       opacity: 0,
       size: 0,
       sizeBehaviourWhenFading: "none",
+      sizeBehaviourWhenGlowing: "none",
       speedX: 0,
       speedY: 0,
-      willChangeSize: false,
       accelerationX: 0,
       accelerationY: 0
     }
 
     this.config = this.initializedConfig
+
+    const fadeOrGlow =
+      Math.random() < firefliesConfig.fadeRatio ? "fade" : "glow"
 
     this.config = {
       accelerationX: this.utilGetRandomNumberBetween(accelerationX),
@@ -74,21 +80,26 @@ class FireFly {
       jitterX: this.utilGetRandomNumberBetween(jitterCoefficientX),
       jitterY: this.utilGetRandomNumberBetween(jitterCoefficientY),
       sizeBehaviourWhenFading:
-        Math.random() < firefliesConfig.sizeBehaviourWhenFading.frequency
-          ? firefliesConfig.sizeBehaviourWhenFading.behaviorType
+        Math.random() < fadeSizeChangeBehaviour.frequency
+          ? fadeSizeChangeBehaviour.behaviorType
+          : "none",
+      sizeBehaviourWhenGlowing:
+        Math.random() < glowSizeChangeBehaviour.frequency
+          ? glowSizeChangeBehaviour.behaviorType
           : "none",
       shape: firefliesConfig.shape,
       opacity: this.determineColor(
         firefliesConfig.colorValueUpdate.mode,
         this.appConfig.fireflies.colorValueUpdate.startingMehtod
       ).a,
-      fadeRate: this.utilGetRandomNumberBetween(fadeRate),
+      fadeOrGlowRate: this.utilGetRandomNumberBetween(
+        fadeOrGlow === "fade" ? fadeRate : glowRate
+      ),
+      fadeOrGlow: fadeOrGlow,
       // size gets randomized based on your config
       size: this.utilGetRandomNumberBetween(size),
       speedX: this.utilGetRandomNumberBetween(speedX),
-      speedY: this.utilGetRandomNumberBetween(speedY),
-      willChangeSize:
-        Math.random() < firefliesConfig.sizeBehaviourWhenFading.frequency
+      speedY: this.utilGetRandomNumberBetween(speedY)
     }
 
     // color value is an object, so it must be copied
@@ -311,41 +322,65 @@ class FireFly {
   // if it reaches 0, it is moved to a random location
   // and its opacity is reset to a random value (> 0.5)
   handleFade = () => {
-    const { fadeRate, sizeBehaviourWhenFading, willChangeSize } = this.config
-    this.config.opacity = this.config.opacity - fadeRate
+    console.log("handleFade")
+    const { fadeOrGlowRate, sizeBehaviourWhenFading } = this.config
+    this.config.opacity = Math.max(this.config.opacity - fadeOrGlowRate, 0)
 
-    if (this.config.opacity < 0) {
-      this.resetConfigAfterFade()
-    }
-
-    if (sizeBehaviourWhenFading === "shrink" && willChangeSize)
+    if (sizeBehaviourWhenFading === "shrink")
       this.config.size = this.config.opacity * this.originalConfig.size
 
-    if (sizeBehaviourWhenFading === "grow" && willChangeSize) {
-      this.config.size = (1 - this.config.opacity) * this.originalConfig.size
+    if (sizeBehaviourWhenFading === "grow") {
+      if (this.config.opacity === 0) {
+        this.config.opacity = 1 - this.config.opacity
+        this.config.size = 0
+      } else
+        this.config.size = (1 - this.config.opacity) * this.originalConfig.size
+    }
+
+    if (this.config.opacity === 0) {
+      console.log("is 0")
+      this.resetConfigAfterFade()
+    }
+  }
+
+  // handleGlow() highers the opacity of the firefly
+  // if it reaches 1, it is moved to a random location
+  // and its opacity is reset to a random value (> 0.5)
+
+  handleGlow = () => {
+    const { fadeOrGlowRate, sizeBehaviourWhenGlowing } = this.config
+    this.config.opacity = Math.min(this.config.opacity + fadeOrGlowRate, 1)
+
+    if (sizeBehaviourWhenGlowing === "grow")
+      this.config.size = this.config.opacity * this.originalConfig.size
+
+    if (sizeBehaviourWhenGlowing === "shrink") {
+      if (this.config.opacity === 0) {
+        this.config.opacity = 1 - this.config.opacity
+        this.config.size = 0
+      } else
+        this.config.size = (1 - this.config.opacity) * this.originalConfig.size
+    }
+
+    if (this.config.opacity === 1) {
+      this.resetConfigAfterGlow()
     }
   }
 
   resetConfigAfterFade = () => {
-    const { sizeBehaviourWhenFading, willChangeSize } = this.config
+    const { resetColorAfterFade, resetSizeAfterFade, resetRateAfterFade } =
+      this.appConfig.fireflies.fade
 
-    const { resetColorAfterFade, resetSizeAfterFade, resetFadeRateAfterFade } =
-      this.appConfig.fireflies
-
-    const { size, fadeRate, newFadeRateAfterFade } = this.appConfig.fireflies
+    const {
+      size,
+      fade: { rate: fadeOrGlowRate, newRateAfterFade }
+    } = this.appConfig.fireflies
 
     this.resetSpeeds()
 
-    if (sizeBehaviourWhenFading === "shrink" && willChangeSize) {
-      this.config.size = this.config.opacity * this.originalConfig.size
-    }
-
-    if (sizeBehaviourWhenFading === "grow" && willChangeSize) {
-      this.config.size = (1 - this.config.opacity) * this.originalConfig.size
-    }
-
-    if (resetFadeRateAfterFade) {
-      this.config.fadeRate = this.utilGetRandomNumberBetween(fadeRate)
+    if (resetRateAfterFade) {
+      this.config.fadeOrGlowRate =
+        this.utilGetRandomNumberBetween(fadeOrGlowRate)
     }
 
     if (resetSizeAfterFade) {
@@ -360,12 +395,57 @@ class FireFly {
     }
 
     this.handleFadePositioning(
-      this.appConfig.fireflies.fadePositioningBehaviour
+      this.appConfig.fireflies.fade.positioningBehaviour
     )
 
     // resets the opacity to a new or original opacity
-    this.config.opacity = this.appConfig.fireflies.resetFadeRateAfterFade
-      ? this.utilGetRandomNumberBetween(newFadeRateAfterFade)
+    this.config.opacity = this.appConfig.fireflies.fade.resetRateAfterFade
+      ? this.utilGetRandomNumberBetween(newRateAfterFade)
+      : this.originalConfig.opacity
+
+    console.log(this.config.opacity)
+
+    this.config.accelerationX = this.utilGetRandomNumberBetween(
+      this.appConfig.fireflies.accelerationX
+    )
+    this.config.accelerationY = this.utilGetRandomNumberBetween(
+      this.appConfig.fireflies.accelerationY
+    )
+  }
+
+  resetConfigAfterGlow = () => {
+    const { resetColorAfterGlow, resetSizeAfterGlow, resetRateAfterGlow } =
+      this.appConfig.fireflies.glow
+    const {
+      size,
+      glow: { rate: fadeOrGlowRate, newRateAfterGlow }
+    } = this.appConfig.fireflies
+
+    this.resetSpeeds()
+
+    if (resetRateAfterGlow) {
+      this.config.fadeOrGlowRate =
+        this.utilGetRandomNumberBetween(fadeOrGlowRate)
+    }
+
+    if (resetSizeAfterGlow) {
+      this.config.size = this.utilGetRandomNumberBetween(size)
+    }
+
+    if (resetColorAfterGlow) {
+      this.config.colorValue = this.determineColor(
+        this.appConfig.fireflies.colorValueUpdate.mode,
+        this.appConfig.fireflies.colorValueUpdate.onFadeMethod
+      )
+    }
+
+    this.handleFadePositioning(
+      this.appConfig.fireflies.glow.positioningBehaviour
+    )
+
+    // resets the opacity to a new or original opacity
+    this.config.opacity = this.appConfig.fireflies.glow.resetRateAfterGlow
+      ? this.utilGetRandomNumberBetween(newRateAfterGlow)
       : this.originalConfig.opacity
 
     this.config.accelerationX = this.utilGetRandomNumberBetween(
@@ -380,11 +460,12 @@ class FireFly {
     this.config.colorValue.h += Math.random() * 3
   }
 
-  handleFadePositioning = (behaviour: FadePositioningBehaviours) => {
-    const { newPositionAfterFade } = this.appConfig.fireflies
+  handleFadePositioning = (behaviour: FadeOrGlowPositioningBehaviourType) => {
+    const { newPositionAfterFade } = this.appConfig.fireflies.fade
 
     switch (behaviour) {
       case "none":
+        console.log(behaviour)
         break
       case "restartAtCenterOfCanvas":
         this.x = this.canvasSize.width / 2
@@ -412,11 +493,8 @@ class FireFly {
     }
   }
 
-  handleOutOfBoundsPositioning = (
-    behaviour: OutOfBoundsPositioningBehaviours
-  ) => {
+  handleBoundsPositioning = () => {
     const {
-      newPositionAfterOutOfBounds,
       bounds: boundsConfig,
       colorValueUpdate: { mode: colorValueUpdateMode },
       hueRangeSpecification: { min: minAllowedHue, max: maxAllowedHue },
@@ -484,11 +562,6 @@ class FireFly {
       }
     }
 
-    const isOutOfBoundsFromLeft = this.x < -size / 2
-    const isOutOfBoundsFromRight = this.x > this.canvasSize.width + size / 2
-    const isOutOfBoundsFromTop = this.y < -size / 2
-    const isOutOfBoundsFromBottom = this.y > this.canvasSize.height + size / 2
-
     const bottomEdge = this.canvasSize.height - size / 2
     const topEdge = size / 2
     const leftEdge = size / 2
@@ -498,16 +571,6 @@ class FireFly {
     const isOnBottomEdge = this.y > bottomEdge
     const isOnLeftEdge = this.x < leftEdge
     const isOnRightEdge = this.x > rightEdge
-
-    const isOutOfBounds =
-      isOutOfBoundsFromLeft ||
-      isOutOfBoundsFromRight ||
-      isOutOfBoundsFromTop ||
-      isOutOfBoundsFromBottom
-
-    if (isOutOfBounds && this.appConfig.fireflies.resetSpeedsAfterOutOfBounds) {
-      this.resetSpeeds()
-    }
 
     if (isOnBottomEdge && stopAtBoundBottom) {
       // ensure the position after the impact
@@ -551,11 +614,36 @@ class FireFly {
 
       return
     }
+  }
+
+  handleOutOfBoundsPositioning = (
+    behaviour: OutOfBoundsPositioningBehaviours
+  ) => {
+    const { newPositionAfterOutOfBounds } = this.appConfig.fireflies
+
+    const { size } = this.config
+
+    const isOutOfBoundsFromLeft = this.x < -size / 2
+    const isOutOfBoundsFromRight = this.x > this.canvasSize.width + size / 2
+    const isOutOfBoundsFromTop = this.y < -size / 2
+    const isOutOfBoundsFromBottom = this.y > this.canvasSize.height + size / 2
+
+    const isOutOfBounds =
+      isOutOfBoundsFromLeft ||
+      isOutOfBoundsFromRight ||
+      isOutOfBoundsFromTop ||
+      isOutOfBoundsFromBottom
+
+    if (isOutOfBounds && this.appConfig.fireflies.resetSpeedsAfterOutOfBounds) {
+      this.resetSpeeds()
+    }
 
     switch (behaviour) {
       case "forceFade":
         if (isOutOfBounds) {
-          this.config.opacity = 0
+          if (this.config.fadeOrGlow === "fade") this.config.opacity = 0
+          else this.config.opacity = 1
+          console.log(this.x, this.y)
         }
         break
       case "continueOnOtherSide":
@@ -641,10 +729,6 @@ class FireFly {
   }
 
   handleMove = () => {
-    this.handleOutOfBoundsPositioning(
-      this.appConfig.fireflies.outOfBoundsPositioningBehaviour
-    )
-
     this.x += this.config.speedX
     this.y += this.config.speedY
   }
@@ -657,7 +741,13 @@ class FireFly {
   }
 
   update(ctx: CanvasRenderingContext2D, hueShiftAmount: number) {
-    this.handleFade()
+    if (this.config.fadeOrGlow === "fade") this.handleFade()
+    else this.handleGlow()
+    this.handleBoundsPositioning()
+    this.handleOutOfBoundsPositioning(
+      this.appConfig.fireflies.outOfBoundsPositioningBehaviour
+    )
+
     this.handleMove()
     this.handleAcceleration()
     this.handleJitter()

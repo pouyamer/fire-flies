@@ -1,4 +1,4 @@
-type FadePositioningBehaviours =
+type FadeOrGlowPositioningBehaviourType =
   //  default behaviour, it does nothing
   | "none"
   | "restartAtRandomPosition"

@@ -9,20 +9,20 @@ const config: IConfig = {
     a: 1
   },
   fireflies: {
-    number: 1000,
-    shape: "square",
+    number: 200,
+    shape: "circle",
     size: {
-      min: 10,
-      max: 10
+      min: 1,
+      max: 100
     },
 
     speedX: {
-      min: -2,
-      max: 2
+      min: -5,
+      max: 5
     },
     speedY: {
-      min: 0,
-      max: 2
+      min: -5,
+      max: 5
     },
 
     accelerationX: {
@@ -31,7 +31,7 @@ const config: IConfig = {
     },
     accelerationY: {
       min: 0,
-      max: 0.1
+      max: 0
     },
     accelerateInCurrentMovingDirection: false,
 
@@ -45,7 +45,7 @@ const config: IConfig = {
     },
 
     colorValueUpdate: {
-      mode: "updatingHue",
+      mode: "singleColor",
       startingMehtod: "min",
       onFadeMethod: "max",
       increasingOrDecreasingOnFade: 2,
@@ -66,7 +66,7 @@ const config: IConfig = {
 
     hueRangeSpecification: {
       min: 0,
-      max: 360
+      max: 100
     },
 
     saturationRangeSpecification: {
@@ -145,7 +145,7 @@ const config: IConfig = {
 
     fadeRate: {
       min: 0,
-      max: 0.1
+      max: 0
       // min: 0,
       // max: 0
     },
@@ -154,21 +154,33 @@ const config: IConfig = {
     resetSizeAfterFade: false,
     resetFadeRateAfterFade: true,
 
-    outOfBoundsPositioningBehaviour: "forceFade",
-    fadePositioningBehaviour: "restartAtRandomXPosition",
+    outOfBoundsPositioningBehaviour: "continueOnOtherSide",
+    fadePositioningBehaviour: "none",
 
     bounds: {
       toggleBounds: {
-        top: false,
+        top: true,
         right: true,
         bottom: true,
         left: true
       },
       afterImpactSpeedMultiplier: {
-        top: 0.75,
-        right: 0.75,
-        bottom: 0.75,
-        left: 0.75
+        top: 1,
+        right: 1,
+        bottom: 1,
+        left: 1
+      },
+      hueIncreaseAmountAfterImpact: {
+        left: 1,
+        right: 1,
+        top: 1,
+        bottom: 1
+      },
+      sizeMultiplierAfterImpact: {
+        top: 0.95,
+        right: 0.95,
+        bottom: 0.95,
+        left: 0.95
       }
     },
 

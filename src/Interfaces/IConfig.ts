@@ -19,7 +19,19 @@ interface IConfig {
     jitterCoefficientX: RangeType
     jitterCoefficientY: RangeType
 
-    number: number // Number of fireflies
+    /* ===== Rotation ===== */
+    // starting Angle
+    startingAngle: number
+    // if true, starting angle will be randomized
+    // ignores startingAngle
+    startAngleOnRandom: boolean
+    // how much (radian) it rotates per frame
+    rotationSpeed: RangeType
+
+    // Number of fireflies
+    count: number
+
+    // Size Range of butterflies
     size: RangeType
 
     // how many is going to glow otherwise fade
@@ -29,7 +41,7 @@ interface IConfig {
       // rate (per frame) that a firefly fade (opacity decay)
       rate: RangeType
       resetRateAfterFade: boolean
-      newRateAfterFade: RangeType
+      opacityAfterFade: RangeType
       // if true: the size of firefly gets new random value when a firefly opacity reaches zero
       resetSizeAfterFade: boolean
 
@@ -53,7 +65,7 @@ interface IConfig {
       // rate (per frame) that a firefly glow (opacity increase)
       rate: RangeType
       resetRateAfterGlow: boolean
-      newRateAfterGlow: RangeType
+      opacityAfterGlow: RangeType
       // if true: the size of firefly gets new random value when a firefly opacity reaches 1
       resetSizeAfterGlow: boolean
 

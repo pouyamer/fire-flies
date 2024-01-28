@@ -71,7 +71,7 @@ const addCanvas = (
   let fireflies: FireFly[] = []
 
   // creating fireflies based on finalConfig
-  for (let i = 0; i < finalConfig.fireflies.number; i++) {
+  for (let i = 0; i < finalConfig.fireflies.count; i++) {
     fireflies.push(
       new FireFly(
         Math.random() * canvasSize.width,
@@ -83,6 +83,30 @@ const addCanvas = (
 
   // first firefly is subject to debug
   fireflies[0].config.debugMode = true
+
+  const testFireFlyconfig = fireflies[0].config
+
+  // test
+
+  testFireFlyconfig.colorValue = {
+    h: 300,
+    s: 60,
+    l: 55,
+    a: testFireFlyconfig.colorValue.a
+  }
+
+  testFireFlyconfig.speedX = 0
+  testFireFlyconfig.speedY = 0
+
+  testFireFlyconfig.size = 100
+
+  testFireFlyconfig.x = canvasSize.width / 2
+  testFireFlyconfig.y = canvasSize.height / 2
+
+  testFireFlyconfig.jitterX = 0
+  testFireFlyconfig.jitterY = 0
+
+  // end test
 
   // get the sizes right, when window gets resized:
 

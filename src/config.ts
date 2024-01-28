@@ -9,8 +9,8 @@ const config: IConfig = {
     a: 1
   },
   fireflies: {
-    number: 100,
-    shape: "circle",
+    count: 1000,
+    shape: "square",
     size: {
       min: 4,
       max: 20
@@ -43,17 +43,23 @@ const config: IConfig = {
       min: -1,
       max: 1
     },
+    startingAngle: 0,
+    rotationSpeed: {
+      min: 0.1,
+      max: 0.3
+    },
+    startAngleOnRandom: false,
     fadeRatio: 1,
 
     fade: {
       rate: {
-        min: 0.005,
-        max: 0.01
+        min: 0,
+        max: 0
       },
 
       // TODO: change this to new opacity after fade (and grow)
       // TODO: Refactor the code
-      newRateAfterFade: {
+      opacityAfterFade: {
         min: 1,
         max: 1
       },
@@ -77,7 +83,7 @@ const config: IConfig = {
         max: 0.012
       },
 
-      newRateAfterGlow: {
+      opacityAfterGlow: {
         min: 0,
         max: 0
       },

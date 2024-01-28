@@ -1,10 +1,15 @@
 interface ISingleFireflyConfig {
+  x: number
+  y: number
   shape: ShapeType
   // speed in which firefly moves
   speedX: number
   speedY: number
   accelerationX: number
   accelerationY: number
+
+  angle: number
+  rotatingSpeed: number
 
   size: number
 

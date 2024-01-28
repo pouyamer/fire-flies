@@ -4,8 +4,6 @@ class FireFly {
   config: ISingleFireflyConfig
   originalConfig: ISingleFireflyConfig
   rainbowMode: boolean
-  x: number
-  y: number
 
   // this is used when nothing is initializedYet
   initializedConfig: ISingleFireflyConfig
@@ -28,8 +26,6 @@ class FireFly {
     appConfig: IConfig,
     debugMode: boolean = false
   ) {
-    this.x = x
-    this.y = y
     this.appConfig = appConfig
     this.indexForMultipleColorValues = 0
 
@@ -44,10 +40,17 @@ class FireFly {
       jitterCoefficientX,
       jitterCoefficientY,
       accelerationX,
-      accelerationY
+      accelerationY,
+      rotationSpeed,
+      startingAngle,
+      startAngleOnRandom
     } = firefliesConfig
 
     this.initializedConfig = {
+      x: 0,
+      y: 0,
+      angle: 0,
+      rotatingSpeed: 0,
       colorValue: {
         h: 0,
         s: 0,
@@ -76,6 +79,13 @@ class FireFly {
       Math.random() < firefliesConfig.fadeRatio ? "fade" : "glow"
 
     this.config = {
+      x,
+      y,
+      // this will change in config later
+      angle: startAngleOnRandom
+        ? this.utilGetRandomNumberBetween({ min: 0, max: Math.PI * 2 })
+        : startingAngle,
+      rotatingSpeed: this.utilGetRandomNumberBetween(rotationSpeed),
       accelerationX: this.utilGetRandomNumberBetween(accelerationX),
       accelerationY: this.utilGetRandomNumberBetween(accelerationY),
       colorValue: this.determineColor(
@@ -122,6 +132,8 @@ class FireFly {
 
     this.rainbowMode = this.appConfig.rainbowMode
   }
+
+  drawRectangleInAngle = (angle: number) => {}
 
   debugLogger = (message: string) => {
     if (this.config.debugMode) {
@@ -314,20 +326,73 @@ class FireFly {
     switch (this.config.shape) {
       case "circle":
         ctx.beginPath()
-        ctx.arc(this.x, this.y, this.config.size / 2, 0, 2 * Math.PI)
-        ctx.moveTo(this.x, this.y)
+        ctx.arc(
+          this.config.x,
+          this.config.y,
+          this.config.size / 2,
+          0,
+          2 * Math.PI
+        )
+        ctx.moveTo(this.config.x, this.config.y)
 
         ctx.fill()
         return
       case "square":
-        ctx.fillRect(
-          this.x - this.config.size / 2,
-          this.y - this.config.size / 2,
+        this.drawRectangle(
+          ctx,
+          this.config.x,
+          this.config.y,
           this.config.size,
-          this.config.size
+          this.config.angle
         )
         return
     }
+  }
+
+  drawRectangle_1 = (
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    size: number,
+    angle: number
+  ) => {
+    ctx.save() // Save the current state
+    ctx.translate(x, y) // Move the origin to the center of the rectangle
+    ctx.rotate((angle * Math.PI) / 180) // Rotate the canvas
+    ctx.fillRect(-size / 2, -size / 2, size, size) // Draw the rectangle
+    ctx.restore() // Restore the original state
+  }
+
+  drawRectangle = (
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    size: number,
+    angle: number
+  ) => {
+    const halfSize = size / 2
+    const cosAngle = Math.cos(angle)
+    const sinAngle = Math.sin(angle)
+
+    ctx.beginPath()
+    ctx.moveTo(
+      x + halfSize * cosAngle - halfSize * sinAngle,
+      y + halfSize * sinAngle + halfSize * cosAngle
+    )
+    ctx.lineTo(
+      x - halfSize * cosAngle - halfSize * sinAngle,
+      y - halfSize * sinAngle + halfSize * cosAngle
+    )
+    ctx.lineTo(
+      x - halfSize * cosAngle + halfSize * sinAngle,
+      y - halfSize * sinAngle - halfSize * cosAngle
+    )
+    ctx.lineTo(
+      x + halfSize * cosAngle + halfSize * sinAngle,
+      y + halfSize * sinAngle - halfSize * cosAngle
+    )
+    ctx.closePath()
+    ctx.fill()
   }
 
   // handleFade() lowers the opacity of the firefly
@@ -475,25 +540,25 @@ class FireFly {
       case "none":
         break
       case "restartAtCenterOfCanvas":
-        this.x = this.canvasSize.width / 2
-        this.y = this.canvasSize.height / 2
+        this.config.x = this.canvasSize.width / 2
+        this.config.y = this.canvasSize.height / 2
         break
       case "restartAtRandomPosition":
-        this.x = Math.random() * this.canvasSize.width
-        this.y = Math.random() * this.canvasSize.height
+        this.config.x = Math.random() * this.canvasSize.width
+        this.config.y = Math.random() * this.canvasSize.height
         break
       case "restartAtRandomXPosition":
-        this.x = Math.random() * this.canvasSize.width
-        this.y = newPositionAfterFade.y
+        this.config.x = Math.random() * this.canvasSize.width
+        this.config.y = newPositionAfterFade.y
         break
       case "restartAtRandomYPosition":
-        this.x = newPositionAfterFade.x
-        this.y = Math.random() * this.canvasSize.height
+        this.config.x = newPositionAfterFade.x
+        this.config.y = Math.random() * this.canvasSize.height
         break
 
       case "restartAtSetPosition":
-        this.x = newPositionAfterFade.x
-        this.y = newPositionAfterFade.y
+        this.config.x = newPositionAfterFade.x
+        this.config.y = newPositionAfterFade.y
         break
       default:
         throw new Error("Unknown FadePositioningBehaviour")
@@ -574,14 +639,14 @@ class FireFly {
     const leftEdge = size / 2
     const rightEdge = this.canvasSize.width - size / 2
 
-    const isOnTopEdge = this.y < topEdge
-    const isOnBottomEdge = this.y > bottomEdge
-    const isOnLeftEdge = this.x < leftEdge
-    const isOnRightEdge = this.x > rightEdge
+    const isOnTopEdge = this.config.y < topEdge
+    const isOnBottomEdge = this.config.y > bottomEdge
+    const isOnLeftEdge = this.config.x < leftEdge
+    const isOnRightEdge = this.config.x > rightEdge
 
     if (isOnBottomEdge && stopAtBoundBottom) {
       // ensure the position after the impact
-      this.y = bottomEdge
+      this.config.y = bottomEdge
 
       // impact decreases the speed and switches the directions
       this.config.speedY =
@@ -596,7 +661,7 @@ class FireFly {
     }
 
     if (isOnTopEdge && stopAtBoundTop) {
-      this.y = topEdge
+      this.config.y = topEdge
       this.config.speedY = -afterImpactSpeedMultiplierTop * this.config.speedY
       increaseHueAfterImpact(hueIncreaseAmountAfterImpactTop)
       changeSizeAfterImpact(sizeMultiplierAfterImpactTop)
@@ -605,7 +670,7 @@ class FireFly {
     }
 
     if (isOnLeftEdge && stopAtBoundLeft) {
-      this.x = leftEdge
+      this.config.x = leftEdge
       this.config.speedX = -afterImpactSpeedMultiplierLeft * this.config.speedX
       increaseHueAfterImpact(hueIncreaseAmountAfterImpactLeft)
       changeSizeAfterImpact(sizeMultiplierAfterImpactLeft)
@@ -614,7 +679,7 @@ class FireFly {
     }
 
     if (isOnRightEdge && stopAtBoundRight) {
-      this.x = rightEdge
+      this.config.x = rightEdge
       this.config.speedX = -afterImpactSpeedMultiplierRight * this.config.speedX
       increaseHueAfterImpact(hueIncreaseAmountAfterImpactRight)
       changeSizeAfterImpact(sizeMultiplierAfterImpactRight)
@@ -630,10 +695,12 @@ class FireFly {
 
     const { size } = this.config
 
-    const isOutOfBoundsFromLeft = this.x < -size / 2
-    const isOutOfBoundsFromRight = this.x > this.canvasSize.width + size / 2
-    const isOutOfBoundsFromTop = this.y < -size / 2
-    const isOutOfBoundsFromBottom = this.y > this.canvasSize.height + size / 2
+    const isOutOfBoundsFromLeft = this.config.x < -size / 2
+    const isOutOfBoundsFromRight =
+      this.config.x > this.canvasSize.width + size / 2
+    const isOutOfBoundsFromTop = this.config.y < -size / 2
+    const isOutOfBoundsFromBottom =
+      this.config.y > this.canvasSize.height + size / 2
 
     const isOutOfBounds =
       isOutOfBoundsFromLeft ||
@@ -655,55 +722,55 @@ class FireFly {
       case "continueOnOtherSide":
         // --  reset the speed after going out of bounds
         if (isOutOfBoundsFromLeft) {
-          this.x = this.canvasSize.width + size / 2
+          this.config.x = this.canvasSize.width + size / 2
           return
         }
         if (isOutOfBoundsFromRight) {
-          this.x = -size / 2
+          this.config.x = -size / 2
           return
         }
         if (isOutOfBoundsFromTop) {
-          this.y = this.canvasSize.height + size / 2
+          this.config.y = this.canvasSize.height + size / 2
           return
         }
         if (isOutOfBoundsFromBottom) {
-          this.y = -size / 2
+          this.config.y = -size / 2
           return
         }
         break
 
       case "restartAtRandomPosition":
         if (isOutOfBounds) {
-          this.x = Math.random() * this.canvasSize.width
-          this.y = Math.random() * this.canvasSize.height
+          this.config.x = Math.random() * this.canvasSize.width
+          this.config.y = Math.random() * this.canvasSize.height
         }
         break
 
       case "restartAtSetPosition":
         if (isOutOfBounds) {
-          this.x = newPositionAfterOutOfBounds.x
-          this.y = newPositionAfterOutOfBounds.y
+          this.config.x = newPositionAfterOutOfBounds.x
+          this.config.y = newPositionAfterOutOfBounds.y
         }
         break
 
       case "restartAtRandomXPosition":
         if (isOutOfBounds) {
-          this.x = Math.random() * this.canvasSize.width
-          this.y = newPositionAfterOutOfBounds.y
+          this.config.x = Math.random() * this.canvasSize.width
+          this.config.y = newPositionAfterOutOfBounds.y
         }
         break
 
       case "restartAtRandomYPosition":
         if (isOutOfBounds) {
-          this.x = newPositionAfterOutOfBounds.x
-          this.y = Math.random() * this.canvasSize.height
+          this.config.x = newPositionAfterOutOfBounds.x
+          this.config.y = Math.random() * this.canvasSize.height
         }
         break
 
       case "restartAtCenterOfCanvas":
         if (isOutOfBounds) {
-          this.x = this.canvasSize.width / 2
-          this.y = this.canvasSize.height / 2
+          this.config.x = this.canvasSize.width / 2
+          this.config.y = this.canvasSize.height / 2
         }
         break
 
@@ -735,20 +802,23 @@ class FireFly {
   }
 
   handleMove = () => {
-    this.x += this.config.speedX
-    this.y += this.config.speedY
+    this.config.x += this.config.speedX
+    this.config.y += this.config.speedY
   }
 
   handleJitter = () => {
     const { jitterX, jitterY } = this.config
 
-    this.x += jitterX * 2 * Math.random() - jitterX
-    this.y += jitterY * 2 * Math.random() - jitterY
+    this.config.x += jitterX * 2 * Math.random() - jitterX
+    this.config.y += jitterY * 2 * Math.random() - jitterY
+  }
+
+  handleRotation = () => {
+    this.config.angle += 0.01 * Math.random()
   }
 
   update(ctx: CanvasRenderingContext2D, hueShiftAmount: number) {
-    this.debugLogger("Test")
-
+    this.handleRotation()
     if (this.config.fadeOrGlow === "fade") this.handleFade()
     else this.handleGlow()
     this.handleBoundsPositioning()

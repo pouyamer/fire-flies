@@ -63,55 +63,9 @@ const config: IConfig = {
     },
     fadeRatio: 1,
 
-    fade: {
-      rate: {
-        min: 0.0025,
-        max: 0.005
-      },
+    fade: fadeConfig,
 
-      // TODO: change this to new opacity after fade (and grow)
-      // TODO: Refactor the code
-      opacityAfterFade: {
-        min: 1,
-        max: 1
-      },
-      newPositionAfterFade: {
-        x: 0,
-        y: 0
-      },
-      positioningBehaviour: "restartAtRandomPosition",
-      resetColorAfterFade: true,
-      resetRateAfterFade: true,
-      resetSizeAfterFade: true,
-      sizeChangeBehaviour: {
-        behaviorType: "none",
-        frequency: 1
-      }
-    },
-
-    glow: {
-      rate: {
-        min: 0.003,
-        max: 0.012
-      },
-
-      opacityAfterGlow: {
-        min: 0,
-        max: 0
-      },
-      newPositionAfterGlow: {
-        x: 0,
-        y: 0
-      },
-      positioningBehaviour: "restartAtRandomPosition",
-      resetColorAfterGlow: true,
-      resetRateAfterGlow: true,
-      resetSizeAfterGlow: false,
-      sizeChangeBehaviour: {
-        behaviorType: "grow",
-        frequency: 1
-      }
-    },
+    glow: glowConfig,
     colorValueUpdate: {
       mode: "updatingHslColor",
       startingMehtod: "random",
@@ -213,32 +167,7 @@ const config: IConfig = {
 
     outOfBoundsPositioningBehaviour: "forceFade",
 
-    bounds: {
-      toggleBounds: {
-        top: true,
-        right: true,
-        bottom: true,
-        left: true
-      },
-      afterImpactSpeedMultiplier: {
-        top: 1,
-        right: 1,
-        bottom: 1,
-        left: 1
-      },
-      hueIncreaseAmountAfterImpact: {
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0
-      },
-      sizeMultiplierAfterImpact: {
-        top: 1,
-        right: 1,
-        bottom: 1,
-        left: 1
-      }
-    },
+    bounds: boundsConfig,
 
     resetSpeedsAfterOutOfBounds: false,
 

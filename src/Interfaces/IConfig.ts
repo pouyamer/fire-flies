@@ -41,55 +41,12 @@ interface IConfig {
     // how many is going to glow otherwise fade
     fadeRatio: number
 
-    fade: {
-      // rate (per frame) that a firefly fade (opacity decay)
-      rate: RangeType
-      resetRateAfterFade: boolean
-      opacityAfterFade: RangeType
-      // if true: the size of firefly gets new random value when a firefly opacity reaches zero
-      resetSizeAfterFade: boolean
+    fade: FadeConfigType
 
-      // when faded gets the color again
-      resetColorAfterFade: boolean
-
-      // it determines what new position fireflies have
-      // after fading
-      positioningBehaviour: FadeOrGlowPositioningBehaviourType
-      sizeChangeBehaviour: {
-        behaviorType: FadeOrGlowSizeBehaviorType
-        frequency: number
-      }
-      newPositionAfterFade: {
-        x: number
-        y: number
-      }
-    }
-
-    glow: {
-      // rate (per frame) that a firefly glow (opacity increase)
-      rate: RangeType
-      resetRateAfterGlow: boolean
-      opacityAfterGlow: RangeType
-      // if true: the size of firefly gets new random value when a firefly opacity reaches 1
-      resetSizeAfterGlow: boolean
-
-      // when Glown gets the color again
-      resetColorAfterGlow: boolean
-
-      // it determines what new position fireflies have
-      // after fading
-      positioningBehaviour: FadeOrGlowPositioningBehaviourType
-      sizeChangeBehaviour: {
-        behaviorType: FadeOrGlowSizeBehaviorType
-        frequency: number
-      }
-      newPositionAfterGlow: {
-        x: number
-        y: number
-      }
-    }
+    glow: GlowConfigType
     /* =============================== Coloring Mode ========================================== */
 
+    // TODO: Add the singleColorValue - weightedColorChoices to colorValueUpdate
     colorValueUpdate: {
       mode: ColorValueUpdateModeType
       // how does the app gets the firefly value
@@ -156,19 +113,7 @@ interface IConfig {
     }
 
     // bounds behaviour
-    bounds: {
-      toggleBounds: DirectionalBooleanType
-
-      // if true: when a firefly gets out of bounds
-      // due to bound disabling
-
-      // how much speed it's going to lose
-      afterImpactSpeedMultiplier: DirectionalNumberType
-      // how much hue increases after it touches the bounds
-      hueIncreaseAmountAfterImpact: DirectionalNumberType
-
-      sizeMultiplierAfterImpact: DirectionalNumberType
-    }
+    bounds: BoundsConfigType
 
     // -- position for
     // -- if afterOutOfBoundBehavior = restartAtSetPosition

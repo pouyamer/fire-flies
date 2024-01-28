@@ -1,1 +1,1 @@
-type ShapeType = "circle" | "square"
+type ShapeType = "circle" | "square" | "regularPolygon" | "regularPolygram"

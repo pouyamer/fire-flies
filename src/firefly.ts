@@ -16,7 +16,7 @@ class FireFly {
   ) => {
     const { min, max } = range
     return getAsInteger
-      ? Math.floor(Math.random() * (max - min) + min)
+      ? Math.floor(Math.random() * (max - min + 1)) + min
       : Math.random() * (max - min) + min
   }
 
@@ -42,15 +42,18 @@ class FireFly {
       accelerationX,
       accelerationY,
       rotationSpeed,
+      rotationAcceleration,
       startingAngle,
-      startAngleOnRandom
+      startAngleOnRandom,
+      regularPolygon: { sideCount }
     } = firefliesConfig
 
     this.initializedConfig = {
       x: 0,
       y: 0,
       angle: 0,
-      rotatingSpeed: 0,
+      rotationSpeed: 0,
+      rotationAcceleration: 0,
       colorValue: {
         h: 0,
         s: 0,
@@ -59,6 +62,7 @@ class FireFly {
       },
       debugMode: false,
       shape: "circle",
+      sideCount: 3,
       fadeOrGlow: "fade",
       fadeOrGlowRate: 0,
       jitterX: 0,
@@ -85,7 +89,9 @@ class FireFly {
       angle: startAngleOnRandom
         ? this.utilGetRandomNumberBetween({ min: 0, max: Math.PI * 2 })
         : startingAngle,
-      rotatingSpeed: this.utilGetRandomNumberBetween(rotationSpeed),
+      rotationSpeed: this.utilGetRandomNumberBetween(rotationSpeed),
+      rotationAcceleration:
+        this.utilGetRandomNumberBetween(rotationAcceleration),
       accelerationX: this.utilGetRandomNumberBetween(accelerationX),
       accelerationY: this.utilGetRandomNumberBetween(accelerationY),
       colorValue: this.determineColor(
@@ -104,6 +110,10 @@ class FireFly {
           ? glowSizeChangeBehaviour.behaviorType
           : "none",
       shape: firefliesConfig.shape,
+      sideCount:
+        firefliesConfig.shape === "square"
+          ? 4
+          : this.utilGetRandomNumberBetween(sideCount, true),
       opacity: this.determineColor(
         firefliesConfig.colorValueUpdate.mode,
         firefliesConfig.colorValueUpdate.startingMehtod
@@ -133,8 +143,6 @@ class FireFly {
     this.rainbowMode = this.appConfig.rainbowMode
   }
 
-  drawRectangleInAngle = (angle: number) => {}
-
   debugLogger = (message: string) => {
     if (this.config.debugMode) {
       console.log(`[DEBUG] - ${message}`)
@@ -151,7 +159,7 @@ class FireFly {
       case "min":
         return specification.min
       case "max":
-        return specification.min
+        return specification.max
       case "random":
         return this.utilGetRandomNumberBetween(specification)
       case "increasing":
@@ -338,63 +346,88 @@ class FireFly {
         ctx.fill()
         return
       case "square":
-        this.drawRectangle(
+      case "regularPolygon":
+        this.drawRegularPolygon(
           ctx,
           this.config.x,
           this.config.y,
           this.config.size,
-          this.config.angle
+          this.config.angle,
+          this.config.sideCount
         )
-        return
+        break
+
+      case "regularPolygram":
+        this.drawPolygram(
+          ctx,
+          this.config.x,
+          this.config.y,
+          this.config.size,
+          this.config.angle,
+          this.config.sideCount
+        )
     }
   }
 
-  drawRectangle_1 = (
+  drawRegularPolygon = (
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,
     size: number,
-    angle: number
-  ) => {
-    ctx.save() // Save the current state
-    ctx.translate(x, y) // Move the origin to the center of the rectangle
-    ctx.rotate((angle * Math.PI) / 180) // Rotate the canvas
-    ctx.fillRect(-size / 2, -size / 2, size, size) // Draw the rectangle
-    ctx.restore() // Restore the original state
-  }
-
-  drawRectangle = (
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    size: number,
-    angle: number
+    angle: number,
+    sideCount: number
   ) => {
     const halfSize = size / 2
-    const cosAngle = Math.cos(angle)
-    const sinAngle = Math.sin(angle)
+
+    angle = ((sideCount - 2) * Math.PI) / (2 * sideCount) + angle
 
     ctx.beginPath()
-    ctx.moveTo(
-      x + halfSize * cosAngle - halfSize * sinAngle,
-      y + halfSize * sinAngle + halfSize * cosAngle
-    )
-    ctx.lineTo(
-      x - halfSize * cosAngle - halfSize * sinAngle,
-      y - halfSize * sinAngle + halfSize * cosAngle
-    )
-    ctx.lineTo(
-      x - halfSize * cosAngle + halfSize * sinAngle,
-      y - halfSize * sinAngle - halfSize * cosAngle
-    )
-    ctx.lineTo(
-      x + halfSize * cosAngle + halfSize * sinAngle,
-      y + halfSize * sinAngle - halfSize * cosAngle
-    )
+    for (let i = 0; i < sideCount; i++) {
+      let dx = halfSize * Math.cos((i * 2 * Math.PI) / sideCount + angle)
+      let dy = halfSize * Math.sin((i * 2 * Math.PI) / sideCount + angle)
+      let outerX = x + dx
+      let outerY = y + dy
+      if (i === 0) {
+        ctx.moveTo(outerX, outerY)
+      } else {
+        ctx.lineTo(outerX, outerY)
+      }
+    }
     ctx.closePath()
     ctx.fill()
   }
 
+  drawPolygram = (
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    size: number,
+    angle: number,
+    sideCount: number
+  ) => {
+    angle = ((sideCount - 2) * Math.PI) / (2 * sideCount) + angle
+
+    const halfSize = size / 2
+    const innerRadius = size / 4
+    const outerRadius = size / 2
+
+    ctx.beginPath()
+    for (let i = 0; i < sideCount; i++) {
+      let dx = outerRadius * Math.cos((i * 2 * Math.PI) / sideCount + angle)
+      let dy = outerRadius * Math.sin((i * 2 * Math.PI) / sideCount + angle)
+      let outerX = x + dx
+      let outerY = y + dy
+
+      dx = innerRadius * Math.cos(((i + 0.5) * 2 * Math.PI) / sideCount + angle)
+      dy = innerRadius * Math.sin(((i + 0.5) * 2 * Math.PI) / sideCount + angle)
+      let innerX = x + dx
+      let innerY = y + dy
+
+      ctx.lineTo(outerX, outerY)
+      ctx.lineTo(innerX, innerY)
+    }
+    ctx.fill()
+  }
   // handleFade() lowers the opacity of the firefly
   // if it reaches 0, it is moved to a random location
   // and its opacity is reset to a random value (> 0.5)
@@ -484,6 +517,8 @@ class FireFly {
     this.config.accelerationY = this.utilGetRandomNumberBetween(
       this.appConfig.fireflies.accelerationY
     )
+
+    this.config.rotationSpeed = this.originalConfig.rotationSpeed
   }
 
   resetConfigAfterGlow = () => {
@@ -527,6 +562,8 @@ class FireFly {
     this.config.accelerationY = this.utilGetRandomNumberBetween(
       this.appConfig.fireflies.accelerationY
     )
+
+    this.config.rotationSpeed = this.originalConfig.rotationSpeed
   }
 
   somewhereOverTheRainbow = () => {
@@ -814,11 +851,16 @@ class FireFly {
   }
 
   handleRotation = () => {
-    this.config.angle += 0.01 * Math.random()
+    this.config.angle += this.config.rotationSpeed
+  }
+
+  handleRotationAcceleration = () => {
+    this.config.rotationSpeed += this.config.rotationAcceleration
   }
 
   update(ctx: CanvasRenderingContext2D, hueShiftAmount: number) {
     this.handleRotation()
+    this.handleRotationAcceleration()
     if (this.config.fadeOrGlow === "fade") this.handleFade()
     else this.handleGlow()
     this.handleBoundsPositioning()

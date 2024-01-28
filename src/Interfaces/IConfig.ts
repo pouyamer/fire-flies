@@ -20,13 +20,17 @@ interface IConfig {
     jitterCoefficientY: RangeType
 
     /* ===== Rotation ===== */
-    // starting Angle
+    //  starting Angle
     startingAngle: number
-    // if true, starting angle will be randomized
-    // ignores startingAngle
+    //  if true, starting angle will be randomized
+    //  ignores startingAngle
     startAngleOnRandom: boolean
-    // how much (radian) it rotates per frame
+    //  rate (radian) of rotation per frame
     rotationSpeed: RangeType
+    //  rate of rotation speed change
+    rotationAcceleration: RangeType
+
+    /* =================== */
 
     // Number of fireflies
     count: number
@@ -144,6 +148,13 @@ interface IConfig {
     outOfBoundsPositioningBehaviour: OutOfBoundsPositioningBehaviours
 
     shape: ShapeType
+
+    // config for regular polygon shape
+    regularPolygon: {
+      // must be more than three
+      sideCount: RangeType
+    }
+
     // bounds behaviour
     bounds: {
       toggleBounds: DirectionalBooleanType

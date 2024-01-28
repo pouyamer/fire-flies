@@ -22,7 +22,12 @@ class FireFly {
       : Math.random() * (max - min) + min
   }
 
-  constructor(x: number, y: number, appConfig: IConfig) {
+  constructor(
+    x: number,
+    y: number,
+    appConfig: IConfig,
+    debugMode: boolean = false
+  ) {
     this.x = x
     this.y = y
     this.appConfig = appConfig
@@ -34,7 +39,6 @@ class FireFly {
       size,
       speedX,
       speedY,
-      fadeRatio,
       fade: { rate: fadeRate, sizeChangeBehaviour: fadeSizeChangeBehaviour },
       glow: { rate: glowRate, sizeChangeBehaviour: glowSizeChangeBehaviour },
       jitterCoefficientX,
@@ -50,6 +54,7 @@ class FireFly {
         l: 0,
         a: 0
       },
+      debugMode: false,
       shape: "circle",
       fadeOrGlow: "fade",
       fadeOrGlowRate: 0,
@@ -75,8 +80,9 @@ class FireFly {
       accelerationY: this.utilGetRandomNumberBetween(accelerationY),
       colorValue: this.determineColor(
         firefliesConfig.colorValueUpdate.mode,
-        this.appConfig.fireflies.colorValueUpdate.startingMehtod
+        firefliesConfig.colorValueUpdate.startingMehtod
       ),
+      debugMode: debugMode,
       jitterX: this.utilGetRandomNumberBetween(jitterCoefficientX),
       jitterY: this.utilGetRandomNumberBetween(jitterCoefficientY),
       sizeBehaviourWhenFading:
@@ -90,7 +96,7 @@ class FireFly {
       shape: firefliesConfig.shape,
       opacity: this.determineColor(
         firefliesConfig.colorValueUpdate.mode,
-        this.appConfig.fireflies.colorValueUpdate.startingMehtod
+        firefliesConfig.colorValueUpdate.startingMehtod
       ).a,
       fadeOrGlowRate: this.utilGetRandomNumberBetween(
         fadeOrGlow === "fade" ? fadeRate : glowRate
@@ -115,6 +121,12 @@ class FireFly {
     this.canvasSize = this.appConfig.canvasSize
 
     this.rainbowMode = this.appConfig.rainbowMode
+  }
+
+  debugLogger = (message: string) => {
+    if (this.config.debugMode) {
+      console.log(`[DEBUG] - ${message}`)
+    }
   }
 
   getDeterminatedValue = (
@@ -322,7 +334,6 @@ class FireFly {
   // if it reaches 0, it is moved to a random location
   // and its opacity is reset to a random value (> 0.5)
   handleFade = () => {
-    console.log("handleFade")
     const { fadeOrGlowRate, sizeBehaviourWhenFading } = this.config
     this.config.opacity = Math.max(this.config.opacity - fadeOrGlowRate, 0)
 
@@ -338,7 +349,6 @@ class FireFly {
     }
 
     if (this.config.opacity === 0) {
-      console.log("is 0")
       this.resetConfigAfterFade()
     }
   }
@@ -373,7 +383,7 @@ class FireFly {
 
     const {
       size,
-      fade: { rate: fadeOrGlowRate, newRateAfterFade }
+      fade: { rate: fadeOrGlowRate, opacityAfterFade }
     } = this.appConfig.fireflies
 
     this.resetSpeeds()
@@ -400,10 +410,8 @@ class FireFly {
 
     // resets the opacity to a new or original opacity
     this.config.opacity = this.appConfig.fireflies.fade.resetRateAfterFade
-      ? this.utilGetRandomNumberBetween(newRateAfterFade)
+      ? this.utilGetRandomNumberBetween(opacityAfterFade)
       : this.originalConfig.opacity
-
-    console.log(this.config.opacity)
 
     this.config.accelerationX = this.utilGetRandomNumberBetween(
       this.appConfig.fireflies.accelerationX
@@ -418,7 +426,7 @@ class FireFly {
       this.appConfig.fireflies.glow
     const {
       size,
-      glow: { rate: fadeOrGlowRate, newRateAfterGlow }
+      glow: { rate: fadeOrGlowRate, opacityAfterGlow }
     } = this.appConfig.fireflies
 
     this.resetSpeeds()
@@ -445,7 +453,7 @@ class FireFly {
 
     // resets the opacity to a new or original opacity
     this.config.opacity = this.appConfig.fireflies.glow.resetRateAfterGlow
-      ? this.utilGetRandomNumberBetween(newRateAfterGlow)
+      ? this.utilGetRandomNumberBetween(opacityAfterGlow)
       : this.originalConfig.opacity
 
     this.config.accelerationX = this.utilGetRandomNumberBetween(
@@ -465,7 +473,6 @@ class FireFly {
 
     switch (behaviour) {
       case "none":
-        console.log(behaviour)
         break
       case "restartAtCenterOfCanvas":
         this.x = this.canvasSize.width / 2
@@ -643,7 +650,6 @@ class FireFly {
         if (isOutOfBounds) {
           if (this.config.fadeOrGlow === "fade") this.config.opacity = 0
           else this.config.opacity = 1
-          console.log(this.x, this.y)
         }
         break
       case "continueOnOtherSide":
@@ -741,6 +747,8 @@ class FireFly {
   }
 
   update(ctx: CanvasRenderingContext2D, hueShiftAmount: number) {
+    this.debugLogger("Test")
+
     if (this.config.fadeOrGlow === "fade") this.handleFade()
     else this.handleGlow()
     this.handleBoundsPositioning()

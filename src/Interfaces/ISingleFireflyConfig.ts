@@ -18,6 +18,9 @@ interface ISingleFireflyConfig {
   // rate of opacity inc or dec
   fadeOrGlowRate: number
 
+  // this firefly is going to be used for debug
+  debugMode: boolean
+
   sizeBehaviourWhenFading: FadeOrGlowSizeBehaviorType
   sizeBehaviourWhenGlowing: FadeOrGlowSizeBehaviorType
 

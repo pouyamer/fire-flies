@@ -81,6 +81,9 @@ const addCanvas = (
     )
   }
 
+  // first firefly is subject to debug
+  fireflies[0].config.debugMode = true
+
   // get the sizes right, when window gets resized:
 
   window.addEventListener("resize", () => {

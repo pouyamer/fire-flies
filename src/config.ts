@@ -9,29 +9,29 @@ const config: IConfig = {
     a: 1
   },
   fireflies: {
-    count: 1000,
-    shape: "square",
+    count: 300,
+    shape: "regularPolygram",
     size: {
       min: 4,
-      max: 20
+      max: 50
     },
 
     speedX: {
-      min: -2,
-      max: 2
+      min: 0,
+      max: 0
     },
     speedY: {
-      min: -2,
-      max: 2
+      min: 0,
+      max: 0
     },
 
     accelerationX: {
-      min: 0,
-      max: 0
+      min: -0.05,
+      max: 0.05
     },
     accelerationY: {
-      min: 0,
-      max: 0
+      min: 0.1,
+      max: 0.3
     },
     accelerateInCurrentMovingDirection: false,
 
@@ -45,16 +45,28 @@ const config: IConfig = {
     },
     startingAngle: 0,
     rotationSpeed: {
-      min: 0.1,
-      max: 0.3
+      min: 0.01,
+      max: 0.1
     },
+    rotationAcceleration: {
+      min: 0.0001,
+      max: 0.0002
+    },
+
     startAngleOnRandom: false,
+
+    regularPolygon: {
+      sideCount: {
+        min: 5,
+        max: 5
+      }
+    },
     fadeRatio: 1,
 
     fade: {
       rate: {
-        min: 0,
-        max: 0
+        min: 0.0025,
+        max: 0.005
       },
 
       // TODO: change this to new opacity after fade (and grow)
@@ -70,7 +82,7 @@ const config: IConfig = {
       positioningBehaviour: "restartAtRandomPosition",
       resetColorAfterFade: true,
       resetRateAfterFade: true,
-      resetSizeAfterFade: false,
+      resetSizeAfterFade: true,
       sizeChangeBehaviour: {
         behaviorType: "none",
         frequency: 1
@@ -96,14 +108,14 @@ const config: IConfig = {
       resetRateAfterGlow: true,
       resetSizeAfterGlow: false,
       sizeChangeBehaviour: {
-        behaviorType: "none",
+        behaviorType: "grow",
         frequency: 1
       }
     },
     colorValueUpdate: {
-      mode: "updatingHue",
-      startingMehtod: "max",
-      onFadeMethod: "decreasing",
+      mode: "updatingHslColor",
+      startingMehtod: "random",
+      onFadeMethod: "random",
       increasingOrDecreasingOnFade: 10,
       increasingOrDecreasingOnFadeAllValues: {
         h: 50,
@@ -121,12 +133,12 @@ const config: IConfig = {
     },
 
     hueRangeSpecification: {
-      min: 20,
-      max: 50
+      min: 0,
+      max: 120
     },
 
     saturationRangeSpecification: {
-      min: 30,
+      min: 40,
       max: 90
     },
 
@@ -145,7 +157,7 @@ const config: IConfig = {
         max: 100
       },
       l: {
-        min: 20,
+        min: 40,
         max: 85
       },
       a: {
@@ -204,9 +216,9 @@ const config: IConfig = {
     bounds: {
       toggleBounds: {
         top: true,
-        right: false,
+        right: true,
         bottom: true,
-        left: false
+        left: true
       },
       afterImpactSpeedMultiplier: {
         top: 1,
@@ -215,10 +227,10 @@ const config: IConfig = {
         left: 1
       },
       hueIncreaseAmountAfterImpact: {
-        left: 1,
-        right: 1,
-        top: 1,
-        bottom: 1
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0
       },
       sizeMultiplierAfterImpact: {
         top: 1,

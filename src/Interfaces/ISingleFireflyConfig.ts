@@ -2,6 +2,7 @@ interface ISingleFireflyConfig {
   x: number
   y: number
   shape: ShapeType
+  sideCount: number
   // speed in which firefly moves
   speedX: number
   speedY: number
@@ -9,7 +10,8 @@ interface ISingleFireflyConfig {
   accelerationY: number
 
   angle: number
-  rotatingSpeed: number
+  rotationSpeed: number
+  rotationAcceleration: number
 
   size: number
 

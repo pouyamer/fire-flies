@@ -1,0 +1,1 @@
+type OpacityChangeModeType = "fade" | "glow"

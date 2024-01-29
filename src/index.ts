@@ -72,13 +72,7 @@ const addCanvas = (
 
   // creating fireflies based on finalConfig
   for (let i = 0; i < finalConfig.fireflies.count; i++) {
-    fireflies.push(
-      new FireFly(
-        Math.random() * canvasSize.width,
-        Math.random() * canvasSize.height,
-        finalConfig
-      )
-    )
+    fireflies.push(new FireFly(finalConfig))
   }
 
   // ============== TEST ============*/

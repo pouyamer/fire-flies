@@ -10,4 +10,6 @@ type BoundsConfigType = {
   hueIncreaseAmountAfterImpact: DirectionalNumberType
 
   sizeMultiplierAfterImpact: DirectionalNumberType
+
+  changeSizeToMinAfterHitMaxSize: boolean
 }

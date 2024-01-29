@@ -20,32 +20,45 @@ class FireFly {
       : Math.random() * (max - min) + min
   }
 
-  constructor(
-    x: number,
-    y: number,
-    appConfig: IConfig,
-    debugMode: boolean = false
-  ) {
+  constructor(appConfig: IConfig, debugMode: boolean = false) {
     this.appConfig = appConfig
     this.indexForMultipleColorValues = 0
+
+    this.canvasSize = this.appConfig.canvasSize
+    this.rainbowMode = this.appConfig.rainbowMode
 
     // getting range values
     const firefliesConfig = appConfig.fireflies
     const {
       size,
-      speedX,
-      speedY,
-      fade: { rate: fadeRate, sizeChangeBehaviour: fadeSizeChangeBehaviour },
-      glow: { rate: glowRate, sizeChangeBehaviour: glowSizeChangeBehaviour },
-      jitterCoefficientX,
-      jitterCoefficientY,
-      accelerationX,
-      accelerationY,
-      rotationSpeed,
-      rotationAcceleration,
-      startingAngle,
-      startAngleOnRandom,
-      regularPolygon: { sideCount }
+
+      startingPositioning: {
+        backFillPosition: startingBackFillPosition,
+        method: startingPositioningMethod
+      },
+      opacityChangeOptions: {
+        fadeRatio,
+        fade: { rate: fadeRate, sizeChange: fadeSizeChangeConfig },
+        glow: { rate: glowRate, sizeChange: glowSizeChangeConfig }
+      },
+      movement: {
+        speedX,
+        speedY,
+        jitterCoefficientX,
+        jitterCoefficientY,
+        accelerationX,
+        accelerationY
+      },
+      rotation: {
+        speed: rotationSpeed,
+        acceleration: rotationAcceleration,
+        startingAngle,
+        startAngleOnRandom
+      },
+      shaping: {
+        regularPolygon: { sideCount },
+        shape
+      }
     } = firefliesConfig
 
     this.initializedConfig = {
@@ -63,8 +76,8 @@ class FireFly {
       debugMode: false,
       shape: "circle",
       sideCount: 3,
-      fadeOrGlow: "fade",
-      fadeOrGlowRate: 0,
+      opacityChangeMode: "fade",
+      opacityChangeRate: 0,
       jitterX: 0,
       jitterY: 0,
       opacity: 0,
@@ -74,60 +87,90 @@ class FireFly {
       speedX: 0,
       speedY: 0,
       accelerationX: 0,
-      accelerationY: 0
+      accelerationY: 0,
+      quarterCircleCenterLocation: "bottom-left"
     }
 
     this.config = this.initializedConfig
 
-    const fadeOrGlow =
-      Math.random() < firefliesConfig.fadeRatio ? "fade" : "glow"
+    const getQuarterCircleCenterLocation = () => {
+      const allLocations: TwoDimentionalDirectionType[] = [
+        "bottom-left",
+        "bottom-right",
+        "top-left",
+        "top-right"
+      ]
+
+      return allLocations[
+        this.utilGetRandomNumberBetween(
+          { min: 0, max: allLocations.length },
+          true
+        )
+      ]
+    }
+
+    const opacityChangeMode = Math.random() < fadeRatio ? "fade" : "glow"
+
+    const getStartingAngle = () => {
+      return startAngleOnRandom
+        ? this.utilGetRandomNumberBetween({ min: 0, max: Math.PI * 2 })
+        : startingAngle
+    }
 
     this.config = {
-      x,
-      y,
+      x: 0,
+      y: 0,
       // this will change in config later
-      angle: startAngleOnRandom
-        ? this.utilGetRandomNumberBetween({ min: 0, max: Math.PI * 2 })
-        : startingAngle,
+      angle: getStartingAngle(),
       rotationSpeed: this.utilGetRandomNumberBetween(rotationSpeed),
       rotationAcceleration:
         this.utilGetRandomNumberBetween(rotationAcceleration),
       accelerationX: this.utilGetRandomNumberBetween(accelerationX),
       accelerationY: this.utilGetRandomNumberBetween(accelerationY),
       colorValue: this.determineColor(
-        firefliesConfig.colorValueUpdate.mode,
-        firefliesConfig.colorValueUpdate.startingMehtod
+        firefliesConfig.colorValue.updateMode,
+        firefliesConfig.colorValue.startingMehtod
       ),
       debugMode: debugMode,
       jitterX: this.utilGetRandomNumberBetween(jitterCoefficientX),
       jitterY: this.utilGetRandomNumberBetween(jitterCoefficientY),
       sizeBehaviourWhenFading:
-        Math.random() < fadeSizeChangeBehaviour.frequency
-          ? fadeSizeChangeBehaviour.behaviorType
+        Math.random() < fadeSizeChangeConfig.frequency
+          ? fadeSizeChangeConfig.mode
           : "none",
       sizeBehaviourWhenGlowing:
-        Math.random() < glowSizeChangeBehaviour.frequency
-          ? glowSizeChangeBehaviour.behaviorType
+        Math.random() < glowSizeChangeConfig.frequency
+          ? glowSizeChangeConfig.mode
           : "none",
-      shape: firefliesConfig.shape,
+      shape: shape,
       sideCount:
-        firefliesConfig.shape === "square"
+        shape === "square"
           ? 4
           : this.utilGetRandomNumberBetween(sideCount, true),
       opacity: this.determineColor(
-        firefliesConfig.colorValueUpdate.mode,
-        firefliesConfig.colorValueUpdate.startingMehtod
+        firefliesConfig.colorValue.updateMode,
+        firefliesConfig.colorValue.startingMehtod
       ).a,
-      fadeOrGlowRate: this.utilGetRandomNumberBetween(
-        fadeOrGlow === "fade" ? fadeRate : glowRate
+      opacityChangeRate: this.utilGetRandomNumberBetween(
+        opacityChangeMode === "fade" ? fadeRate : glowRate
       ),
-      fadeOrGlow: fadeOrGlow,
+      opacityChangeMode,
       // size gets randomized based on your config
       size: this.utilGetRandomNumberBetween(size),
       speedX: this.utilGetRandomNumberBetween(speedX),
-      speedY: this.utilGetRandomNumberBetween(speedY)
+      speedY: this.utilGetRandomNumberBetween(speedY),
+
+      // Where the center of the quarter circle is located
+      quarterCircleCenterLocation: getQuarterCircleCenterLocation()
     }
 
+    const { x: startingX, y: startingY } = this.getNewPosition(
+      startingPositioningMethod,
+      startingBackFillPosition
+    )
+
+    this.config.x = startingX
+    this.config.y = startingY
     // color value is an object, so it must be copied
     this.originalConfig = {
       ...{
@@ -137,10 +180,6 @@ class FireFly {
         }
       }
     }
-
-    this.canvasSize = this.appConfig.canvasSize
-
-    this.rainbowMode = this.appConfig.rainbowMode
   }
 
   debugLogger = (message: string) => {
@@ -175,24 +214,57 @@ class FireFly {
     }
   }
 
+  getNewPosition = (
+    method: StartingPositioningMethodType,
+    backFillPosition: CartesianCoordinateSystemType
+  ): CartesianCoordinateSystemType => {
+    switch (method) {
+      case "centerOfCanvas":
+        return {
+          x: this.canvasSize.width / 2,
+          y: this.canvasSize.height / 2
+        }
+      case "random":
+        return {
+          x: Math.random() * this.canvasSize.width,
+          y: Math.random() * this.canvasSize.height
+        }
+      case "randomX":
+        return {
+          x: Math.random() * this.canvasSize.width,
+          y: backFillPosition.y
+        }
+
+      case "randomY":
+        return {
+          x: backFillPosition.x,
+          y: Math.random() * this.canvasSize.height
+        }
+      case "set":
+        return backFillPosition
+
+      default:
+        throw new Error("Unknown FadePositioningBehaviour")
+    }
+  }
+
   determineColor = (
     coloringMode: ColorValueUpdateModeType,
     determinationMethod: ColorDeterminationMethodType = "random"
   ): IHSLColor => {
     const { fireflies: firefliesConfig } = this.appConfig
+
     const {
+      increasingOrDecreasingOnFade,
       singleColorValue,
       hueRangeSpecification,
       saturationRangeSpecification,
       lightnessRangeSpecification
-    } = firefliesConfig
-
-    const { increasingOrDecreasingOnFade } =
-      this.appConfig.fireflies.colorValueUpdate
+    } = this.appConfig.fireflies.colorValue
 
     switch (coloringMode) {
       case "singleColor":
-        return { ...firefliesConfig.singleColorValue }
+        return { ...singleColorValue }
 
       case "updatingHue":
         return {
@@ -233,14 +305,13 @@ class FireFly {
           s: saturationRSpec,
           l: lightnessRSpec,
           a: alphaRSpec
-        } = firefliesConfig.hslColorRangeSpecification
+        } = firefliesConfig.colorValue.hslColorRangeSpecification
         const {
           h: hueIncOrDec,
           s: saturationIncOrDec,
           l: lightnessIncOrDec,
           a: alphaIncOrDec
-        } = firefliesConfig.colorValueUpdate
-          .increasingOrDecreasingOnFadeAllValues
+        } = firefliesConfig.colorValue.increasingOrDecreasingOnFadeAllValues
 
         return {
           h: this.getDeterminatedValue(
@@ -270,7 +341,7 @@ class FireFly {
         }
 
       case "multipleColorValues":
-        const { weightedColorChoices } = firefliesConfig
+        const { weightedColorChoices } = firefliesConfig.colorValue
 
         const minIndex = 0
         const maxIndex = weightedColorChoices.length - 1
@@ -293,14 +364,14 @@ class FireFly {
           }
 
           // Return the corresponding color
-          return weightedColorChoices[i].value
+          return { ...weightedColorChoices[i].value }
         }
 
         if (determinationMethod === "min") {
-          return weightedColorChoices[minIndex].value
+          return { ...weightedColorChoices[minIndex].value }
         }
         if (determinationMethod === "max") {
-          return weightedColorChoices[maxIndex].value
+          return { ...weightedColorChoices[maxIndex].value }
         }
         if (
           determinationMethod === "increasing" ||
@@ -316,7 +387,9 @@ class FireFly {
             1
           )
 
-          return weightedColorChoices[this.indexForMultipleColorValues].value
+          return {
+            ...weightedColorChoices[this.indexForMultipleColorValues].value
+          }
         }
 
       default:
@@ -366,6 +439,20 @@ class FireFly {
           this.config.angle,
           this.config.sideCount
         )
+        break
+
+      case "quarterCircle": {
+        this.drawQuarterCircle(
+          ctx,
+          this.config.x,
+          this.config.y,
+          this.config.size,
+          this.config.quarterCircleCenterLocation,
+          this.config.angle
+        )
+
+        break
+      }
     }
   }
 
@@ -428,12 +515,60 @@ class FireFly {
     }
     ctx.fill()
   }
+
+  drawQuarterCircle = (
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    size: number,
+    centerOn: TwoDimentionalDirectionType,
+    angle: number
+  ) => {
+    let cX = 0,
+      cY = 0,
+      startAngle = 0,
+      endAngle = 0
+    switch (centerOn) {
+      case "top-left":
+        cY = y - size / 2
+        cX = x - size / 2
+        startAngle = 0 + angle
+        endAngle = Math.PI / 2 + angle
+        break
+
+      case "top-right":
+        cY = y + size / 2
+        cX = x + size / 2
+        startAngle = Math.PI / 2 + angle
+        endAngle = Math.PI + angle
+        break
+      case "bottom-left":
+        cX = x - size / 2
+        cY = y + size / 2
+        startAngle = (3 * Math.PI) / 2 + angle
+        endAngle = 2 * Math.PI + angle
+        break
+      case "bottom-right":
+        cX = x - size / 2
+        cY = y + size / 2
+        startAngle = Math.PI + angle
+        endAngle = (3 * Math.PI) / 2 + angle
+
+        break
+    }
+
+    ctx.beginPath()
+    ctx.moveTo(cX, cY)
+    ctx.arc(cX, cY, size, startAngle, endAngle)
+
+    ctx.fill()
+  }
   // handleFade() lowers the opacity of the firefly
   // if it reaches 0, it is moved to a random location
   // and its opacity is reset to a random value (> 0.5)
   handleFade = () => {
-    const { fadeOrGlowRate, sizeBehaviourWhenFading } = this.config
-    this.config.opacity = Math.max(this.config.opacity - fadeOrGlowRate, 0)
+    const { opacityChangeRate, sizeBehaviourWhenFading } = this.config
+    this.config.opacity = Math.max(this.config.opacity - opacityChangeRate, 0)
 
     if (sizeBehaviourWhenFading === "shrink")
       this.config.size = this.config.opacity * this.originalConfig.size
@@ -447,7 +582,7 @@ class FireFly {
     }
 
     if (this.config.opacity === 0) {
-      this.resetConfigAfterFade()
+      this.resetConfigAfterOpacityChange("fade")
     }
   }
 
@@ -456,8 +591,8 @@ class FireFly {
   // and its opacity is reset to a random value (> 0.5)
 
   handleGlow = () => {
-    const { fadeOrGlowRate, sizeBehaviourWhenGlowing } = this.config
-    this.config.opacity = Math.min(this.config.opacity + fadeOrGlowRate, 1)
+    const { opacityChangeRate, sizeBehaviourWhenGlowing } = this.config
+    this.config.opacity = Math.min(this.config.opacity + opacityChangeRate, 1)
 
     if (sizeBehaviourWhenGlowing === "grow")
       this.config.size = this.config.opacity * this.originalConfig.size
@@ -471,96 +606,65 @@ class FireFly {
     }
 
     if (this.config.opacity === 1) {
-      this.resetConfigAfterGlow()
+      this.resetConfigAfterOpacityChange("glow")
     }
   }
 
-  resetConfigAfterFade = () => {
-    const { resetColorAfterFade, resetSizeAfterFade, resetRateAfterFade } =
-      this.appConfig.fireflies.fade
+  resetConfigAfterOpacityChange = (
+    opacityChangeMode: OpacityChangeModeType
+  ) => {
+    const { fade: fadeConfig, glow: glowConfig } =
+      this.appConfig.fireflies.opacityChangeOptions
+
+    const opacityChangeConfig =
+      opacityChangeMode === "fade" ? fadeConfig : glowConfig
 
     const {
-      size,
-      fade: { rate: fadeOrGlowRate, opacityAfterFade }
-    } = this.appConfig.fireflies
+      resetColorAfterOpacityChange,
+      resetSizeAfterOpacityChange,
+      resetRateAfterOpacityChange,
+      opacityAfterOpacityChange
+    } = opacityChangeConfig
+
+    const { size } = this.appConfig.fireflies
 
     this.resetSpeeds()
 
-    if (resetRateAfterFade) {
-      this.config.fadeOrGlowRate =
-        this.utilGetRandomNumberBetween(fadeOrGlowRate)
-    }
-
-    if (resetSizeAfterFade) {
-      this.config.size = this.utilGetRandomNumberBetween(size)
-    }
-
-    if (resetColorAfterFade) {
-      this.config.colorValue = this.determineColor(
-        this.appConfig.fireflies.colorValueUpdate.mode,
-        this.appConfig.fireflies.colorValueUpdate.onFadeMethod
+    if (resetRateAfterOpacityChange) {
+      this.config.opacityChangeRate = this.utilGetRandomNumberBetween(
+        opacityChangeConfig.rate
       )
     }
 
-    this.handleFadePositioning(
-      this.appConfig.fireflies.fade.positioningBehaviour
-    )
-
-    // resets the opacity to a new or original opacity
-    this.config.opacity = this.appConfig.fireflies.fade.resetRateAfterFade
-      ? this.utilGetRandomNumberBetween(opacityAfterFade)
-      : this.originalConfig.opacity
-
-    this.config.accelerationX = this.utilGetRandomNumberBetween(
-      this.appConfig.fireflies.accelerationX
-    )
-    this.config.accelerationY = this.utilGetRandomNumberBetween(
-      this.appConfig.fireflies.accelerationY
-    )
-
-    this.config.rotationSpeed = this.originalConfig.rotationSpeed
-  }
-
-  resetConfigAfterGlow = () => {
-    const { resetColorAfterGlow, resetSizeAfterGlow, resetRateAfterGlow } =
-      this.appConfig.fireflies.glow
-    const {
-      size,
-      glow: { rate: fadeOrGlowRate, opacityAfterGlow }
-    } = this.appConfig.fireflies
-
-    this.resetSpeeds()
-
-    if (resetRateAfterGlow) {
-      this.config.fadeOrGlowRate =
-        this.utilGetRandomNumberBetween(fadeOrGlowRate)
-    }
-
-    if (resetSizeAfterGlow) {
+    if (resetSizeAfterOpacityChange) {
       this.config.size = this.utilGetRandomNumberBetween(size)
     }
 
-    if (resetColorAfterGlow) {
+    if (resetColorAfterOpacityChange) {
       this.config.colorValue = this.determineColor(
-        this.appConfig.fireflies.colorValueUpdate.mode,
-        this.appConfig.fireflies.colorValueUpdate.onFadeMethod
+        this.appConfig.fireflies.colorValue.updateMode,
+        this.appConfig.fireflies.colorValue.onFadeMethod
       )
     }
 
-    this.handleFadePositioning(
-      this.appConfig.fireflies.glow.positioningBehaviour
+    const { x: newX, y: newY } = this.getNewPosition(
+      opacityChangeConfig.positioningMethod,
+      opacityChangeConfig.backFillPosition
     )
 
+    this.config.x = newX
+    this.config.y = newY
+
     // resets the opacity to a new or original opacity
-    this.config.opacity = this.appConfig.fireflies.glow.resetRateAfterGlow
-      ? this.utilGetRandomNumberBetween(opacityAfterGlow)
+    this.config.opacity = opacityChangeConfig.resetRateAfterOpacityChange
+      ? this.utilGetRandomNumberBetween(opacityAfterOpacityChange)
       : this.originalConfig.opacity
 
     this.config.accelerationX = this.utilGetRandomNumberBetween(
-      this.appConfig.fireflies.accelerationX
+      this.appConfig.fireflies.movement.accelerationX
     )
     this.config.accelerationY = this.utilGetRandomNumberBetween(
-      this.appConfig.fireflies.accelerationY
+      this.appConfig.fireflies.movement.accelerationY
     )
 
     this.config.rotationSpeed = this.originalConfig.rotationSpeed
@@ -570,43 +674,17 @@ class FireFly {
     this.config.colorValue.h += Math.random() * 3
   }
 
-  handleFadePositioning = (behaviour: FadeOrGlowPositioningBehaviourType) => {
-    const { newPositionAfterFade } = this.appConfig.fireflies.fade
-
-    switch (behaviour) {
-      case "none":
-        break
-      case "restartAtCenterOfCanvas":
-        this.config.x = this.canvasSize.width / 2
-        this.config.y = this.canvasSize.height / 2
-        break
-      case "restartAtRandomPosition":
-        this.config.x = Math.random() * this.canvasSize.width
-        this.config.y = Math.random() * this.canvasSize.height
-        break
-      case "restartAtRandomXPosition":
-        this.config.x = Math.random() * this.canvasSize.width
-        this.config.y = newPositionAfterFade.y
-        break
-      case "restartAtRandomYPosition":
-        this.config.x = newPositionAfterFade.x
-        this.config.y = Math.random() * this.canvasSize.height
-        break
-
-      case "restartAtSetPosition":
-        this.config.x = newPositionAfterFade.x
-        this.config.y = newPositionAfterFade.y
-        break
-      default:
-        throw new Error("Unknown FadePositioningBehaviour")
-    }
-  }
-
   handleBoundsPositioning = () => {
     const {
       bounds: boundsConfig,
-      colorValueUpdate: { mode: colorValueUpdateMode },
-      hueRangeSpecification: { min: minAllowedHue, max: maxAllowedHue },
+      colorValue: {
+        updateMode: colorValueUpdateMode,
+        hueRangeSpecification: { min: minAllowedHue, max: maxAllowedHue },
+        hslColorRangeSpecification: {
+          h: { max: maxAllowedHueInHsl, min: minAllowedHueInHsl }
+        }
+      },
+
       size: { min: minAllowedSize, max: maxAllowedSize }
     } = this.appConfig.fireflies
 
@@ -640,20 +718,41 @@ class FireFly {
     const { size } = this.config
 
     const increaseHueAfterImpact = (amount: number) => {
-      this.config.colorValue.h += amount
+      switch (colorValueUpdateMode) {
+        case "singleColor":
+          return
+        case "updatingHslColor":
+          this.config.colorValue.h += amount
 
-      if (colorValueUpdateMode === "singleColor") {
-        return
-      }
+          if (this.config.colorValue.h > maxAllowedHueInHsl) {
+            this.config.colorValue.h = minAllowedHueInHsl
+            return
+          }
 
-      if (this.config.colorValue.h > maxAllowedHue) {
-        this.config.colorValue.h = minAllowedHue
-        return
-      }
+          if (this.config.colorValue.h < minAllowedHueInHsl) {
+            this.config.colorValue.h = maxAllowedHueInHsl
+            return
+          }
+          return
 
-      if (this.config.colorValue.h < minAllowedHue) {
-        this.config.colorValue.h = maxAllowedHue
-        return
+        case "updatingHue":
+          this.config.colorValue.h += amount
+
+          if (this.config.colorValue.h > maxAllowedHue) {
+            this.config.colorValue.h = minAllowedHue
+            return
+          }
+
+          if (this.config.colorValue.h < minAllowedHue) {
+            this.config.colorValue.h = maxAllowedHue
+            return
+          }
+          return
+
+        case "updatingSaturation":
+        case "updatingLightness":
+        case "multipleColorValues":
+          return
       }
     }
 
@@ -665,7 +764,10 @@ class FireFly {
         return
       }
 
-      if (this.config.size > maxAllowedSize) {
+      if (
+        this.config.size > maxAllowedSize &&
+        this.appConfig.fireflies.bounds.changeSizeToMinAfterHitMaxSize
+      ) {
         this.config.size = minAllowedSize
         return
       }
@@ -694,7 +796,6 @@ class FireFly {
 
       // impact causes fireflies to shrink/grow
       changeSizeAfterImpact(sizeMultiplierAfterImpactBottom)
-      return
     }
 
     if (isOnTopEdge && stopAtBoundTop) {
@@ -702,8 +803,6 @@ class FireFly {
       this.config.speedY = -afterImpactSpeedMultiplierTop * this.config.speedY
       increaseHueAfterImpact(hueIncreaseAmountAfterImpactTop)
       changeSizeAfterImpact(sizeMultiplierAfterImpactTop)
-
-      return
     }
 
     if (isOnLeftEdge && stopAtBoundLeft) {
@@ -711,8 +810,6 @@ class FireFly {
       this.config.speedX = -afterImpactSpeedMultiplierLeft * this.config.speedX
       increaseHueAfterImpact(hueIncreaseAmountAfterImpactLeft)
       changeSizeAfterImpact(sizeMultiplierAfterImpactLeft)
-
-      return
     }
 
     if (isOnRightEdge && stopAtBoundRight) {
@@ -720,15 +817,12 @@ class FireFly {
       this.config.speedX = -afterImpactSpeedMultiplierRight * this.config.speedX
       increaseHueAfterImpact(hueIncreaseAmountAfterImpactRight)
       changeSizeAfterImpact(sizeMultiplierAfterImpactRight)
-
-      return
     }
   }
 
-  handleOutOfBoundsPositioning = (
-    behaviour: OutOfBoundsPositioningBehaviours
-  ) => {
-    const { newPositionAfterOutOfBounds } = this.appConfig.fireflies
+  handleOutOfBoundsPositioning = (method: OutOfBoundsPositioningMethodType) => {
+    const { backFillPosition: outOfBoundsBackFillPosition } =
+      this.appConfig.fireflies.outOfBounds
 
     const { size } = this.config
 
@@ -745,14 +839,14 @@ class FireFly {
       isOutOfBoundsFromTop ||
       isOutOfBoundsFromBottom
 
-    if (isOutOfBounds && this.appConfig.fireflies.resetSpeedsAfterOutOfBounds) {
+    if (isOutOfBounds && this.appConfig.fireflies.outOfBounds.resetSpeeds) {
       this.resetSpeeds()
     }
 
-    switch (behaviour) {
+    switch (method) {
       case "forceFade":
         if (isOutOfBounds) {
-          if (this.config.fadeOrGlow === "fade") this.config.opacity = 0
+          if (this.config.opacityChangeMode === "fade") this.config.opacity = 0
           else this.config.opacity = 1
         }
         break
@@ -776,35 +870,35 @@ class FireFly {
         }
         break
 
-      case "restartAtRandomPosition":
+      case "random":
         if (isOutOfBounds) {
           this.config.x = Math.random() * this.canvasSize.width
           this.config.y = Math.random() * this.canvasSize.height
         }
         break
 
-      case "restartAtSetPosition":
+      case "set":
         if (isOutOfBounds) {
-          this.config.x = newPositionAfterOutOfBounds.x
-          this.config.y = newPositionAfterOutOfBounds.y
+          this.config.x = outOfBoundsBackFillPosition.x
+          this.config.y = outOfBoundsBackFillPosition.y
         }
         break
 
-      case "restartAtRandomXPosition":
+      case "randomX":
         if (isOutOfBounds) {
           this.config.x = Math.random() * this.canvasSize.width
-          this.config.y = newPositionAfterOutOfBounds.y
+          this.config.y = outOfBoundsBackFillPosition.y
         }
         break
 
-      case "restartAtRandomYPosition":
+      case "randomY":
         if (isOutOfBounds) {
-          this.config.x = newPositionAfterOutOfBounds.x
+          this.config.x = outOfBoundsBackFillPosition.x
           this.config.y = Math.random() * this.canvasSize.height
         }
         break
 
-      case "restartAtCenterOfCanvas":
+      case "centerOfCanvas":
         if (isOutOfBounds) {
           this.config.x = this.canvasSize.width / 2
           this.config.y = this.canvasSize.height / 2
@@ -827,7 +921,8 @@ class FireFly {
   }
 
   handleAcceleration = () => {
-    const { accelerateInCurrentMovingDirection } = this.appConfig.fireflies
+    const { accelerateInCurrentMovingDirection } =
+      this.appConfig.fireflies.movement
     // increase/decreasing speed of fireflies bt acceleration
     this.config.speedX +=
       this.config.accelerationX *
@@ -861,11 +956,11 @@ class FireFly {
   update(ctx: CanvasRenderingContext2D, hueShiftAmount: number) {
     this.handleRotation()
     this.handleRotationAcceleration()
-    if (this.config.fadeOrGlow === "fade") this.handleFade()
+    if (this.config.opacityChangeMode === "fade") this.handleFade()
     else this.handleGlow()
     this.handleBoundsPositioning()
     this.handleOutOfBoundsPositioning(
-      this.appConfig.fireflies.outOfBoundsPositioningBehaviour
+      this.appConfig.fireflies.outOfBounds.postitioningMethod
     )
 
     this.handleMove()

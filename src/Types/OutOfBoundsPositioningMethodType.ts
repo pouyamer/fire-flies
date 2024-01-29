@@ -1,4 +1,4 @@
-type OutOfBoundsPositioningBehaviours =
+type OutOfBoundsPositioningMethodType =
   // for example if it goes to bottom it continues at the top
   | "continueOnOtherSide"
   // -- if this is set to true then when out of bound,
@@ -6,10 +6,10 @@ type OutOfBoundsPositioningBehaviours =
   | "forceFade"
   //  default behaviour, it does nothing
   | "none"
-  | "restartAtCenterOfCanvas"
-  | "restartAtRandomPosition"
+  | "centerOfCanvas"
+  | "random"
   // set the fixed y position at config outOfBoundsRestartPosition.y
-  | "restartAtRandomXPosition"
+  | "randomX"
   // set the fixed x position at config outOfBoundsRestartPosition.x
-  | "restartAtRandomYPosition"
-  | "restartAtSetPosition"
+  | "randomY"
+  | "set"

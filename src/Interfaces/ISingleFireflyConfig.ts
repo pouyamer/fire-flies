@@ -21,16 +21,18 @@ interface ISingleFireflyConfig {
   /* ========================================================================================*/
 
   opacity: number
-  fadeOrGlow: FadeOrGlowType
+  opacityChangeMode: OpacityChangeModeType
   // rate of opacity inc or dec
-  fadeOrGlowRate: number
+  opacityChangeRate: number
 
   // this firefly is going to be used for debug
   debugMode: boolean
 
-  sizeBehaviourWhenFading: FadeOrGlowSizeBehaviorType
-  sizeBehaviourWhenGlowing: FadeOrGlowSizeBehaviorType
+  sizeBehaviourWhenFading: OpacityChangeSizeChangeModeType
+  sizeBehaviourWhenGlowing: OpacityChangeSizeChangeModeType
 
   jitterX: number
   jitterY: number
+
+  quarterCircleCenterLocation: TwoDimentionalDirectionType
 }

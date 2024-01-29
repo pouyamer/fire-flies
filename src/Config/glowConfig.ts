@@ -1,23 +1,23 @@
-const glowConfig: GlowConfigType = {
+const glowConfig: OpacityChangeConfigType = {
   rate: {
     min: 0.003,
     max: 0.012
   },
 
-  opacityAfterGlow: {
+  opacityAfterOpacityChange: {
     min: 0,
     max: 0
   },
-  newPositionAfterGlow: {
+  backFillPosition: {
     x: 0,
     y: 0
   },
-  positioningBehaviour: "restartAtRandomPosition",
-  resetColorAfterGlow: true,
-  resetRateAfterGlow: true,
-  resetSizeAfterGlow: false,
-  sizeChangeBehaviour: {
-    behaviorType: "grow",
+  positioningMethod: "random",
+  resetColorAfterOpacityChange: true,
+  resetRateAfterOpacityChange: true,
+  resetSizeAfterOpacityChange: false,
+  sizeChange: {
+    mode: "grow",
     frequency: 1
   }
 }

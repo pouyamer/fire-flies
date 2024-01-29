@@ -1,25 +1,25 @@
-const fadeConfig: FadeConfigType = {
+const fadeConfig: OpacityChangeConfigType = {
   rate: {
-    min: 0.0025,
-    max: 0.005
+    min: 0.007,
+    max: 0.015
   },
 
   // TODO: change this to new opacity after fade (and grow)
   // TODO: Refactor the code
-  opacityAfterFade: {
+  opacityAfterOpacityChange: {
     min: 1,
     max: 1
   },
-  newPositionAfterFade: {
+  backFillPosition: {
     x: 0,
     y: 0
   },
-  positioningBehaviour: "restartAtRandomPosition",
-  resetColorAfterFade: true,
-  resetRateAfterFade: true,
-  resetSizeAfterFade: true,
-  sizeChangeBehaviour: {
-    behaviorType: "none",
+  positioningMethod: "randomX",
+  resetColorAfterOpacityChange: true,
+  resetRateAfterOpacityChange: true,
+  resetSizeAfterOpacityChange: true,
+  sizeChange: {
+    mode: "none",
     frequency: 1
   }
 }

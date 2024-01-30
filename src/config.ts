@@ -9,7 +9,7 @@ const config: IConfig = {
     a: 1
   },
   fireflies: {
-    count: 300,
+    count: 3000,
 
     size: {
       min: 4,

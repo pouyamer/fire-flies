@@ -404,56 +404,49 @@ class FireFly {
       this.config.colorValue.l,
       this.config.opacity
     )
+
+    const { x, y, size, angle, sideCount, quarterCircleCenterLocation } =
+      this.config
+
     switch (this.config.shape) {
       case "circle":
-        ctx.beginPath()
-        ctx.arc(
-          this.config.x,
-          this.config.y,
-          this.config.size / 2,
-          0,
-          2 * Math.PI
-        )
-        ctx.moveTo(this.config.x, this.config.y)
-
-        ctx.fill()
-        return
+        this.drawCircle(ctx, this.config.x, this.config.y, this.config.size / 2)
+        break
       case "square":
       case "regularPolygon":
-        this.drawRegularPolygon(
-          ctx,
-          this.config.x,
-          this.config.y,
-          this.config.size,
-          this.config.angle,
-          this.config.sideCount
-        )
+        this.drawRegularPolygon(ctx, x, y, size, angle, sideCount)
         break
 
       case "regularPolygram":
-        this.drawPolygram(
-          ctx,
-          this.config.x,
-          this.config.y,
-          this.config.size,
-          this.config.angle,
-          this.config.sideCount
-        )
+        this.drawPolygram(ctx, x, y, size, angle, sideCount)
         break
 
       case "quarterCircle": {
         this.drawQuarterCircle(
           ctx,
-          this.config.x,
-          this.config.y,
-          this.config.size,
-          this.config.quarterCircleCenterLocation,
-          this.config.angle
+          x,
+          y,
+          size,
+          quarterCircleCenterLocation,
+          angle
         )
 
         break
       }
     }
+  }
+
+  drawCircle = (
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    radius: number
+  ) => {
+    ctx.beginPath()
+    ctx.arc(x, y, radius, 0, 2 * Math.PI)
+    ctx.moveTo(x, y)
+
+    ctx.fill()
   }
 
   drawRegularPolygon = (
@@ -472,7 +465,7 @@ class FireFly {
     for (let i = 0; i < sideCount; i++) {
       let dx = halfSize * Math.cos((i * 2 * Math.PI) / sideCount + angle)
       let dy = halfSize * Math.sin((i * 2 * Math.PI) / sideCount + angle)
-      let outerX = x + dx
+      let outerX = x + +dx
       let outerY = y + dy
       if (i === 0) {
         ctx.moveTo(outerX, outerY)
@@ -494,7 +487,6 @@ class FireFly {
   ) => {
     angle = ((sideCount - 2) * Math.PI) / (2 * sideCount) + angle
 
-    const halfSize = size / 2
     const innerRadius = size / 4
     const outerRadius = size / 2
 
@@ -773,9 +765,9 @@ class FireFly {
       }
     }
 
-    const bottomEdge = this.canvasSize.height - size / 2
     const topEdge = size / 2
     const leftEdge = size / 2
+    const bottomEdge = this.canvasSize.height - size / 2
     const rightEdge = this.canvasSize.width - size / 2
 
     const isOnTopEdge = this.config.y < topEdge
@@ -783,55 +775,74 @@ class FireFly {
     const isOnLeftEdge = this.config.x < leftEdge
     const isOnRightEdge = this.config.x > rightEdge
 
-    if (isOnBottomEdge && stopAtBoundBottom) {
+    const changeConfigAfterImpact = (
+      edge: number,
+      edgeAxis: "x" | "y",
+      afterImpactSpeedMultiplier: number,
+      hueIncreaseAmountAfterImpact: number,
+      sizeMultiplierAfterImpact: number
+    ) => {
       // ensure the position after the impact
-      this.config.y = bottomEdge
-
-      // impact decreases the speed and switches the directions
-      this.config.speedY =
-        -afterImpactSpeedMultiplierBottom * this.config.speedY
+      if (edgeAxis === "x") {
+        this.config.x = edge
+        this.config.speedX = -afterImpactSpeedMultiplier * this.config.speedX
+      }
+      if (edgeAxis === "y") {
+        this.config.y = edge
+        this.config.speedY = -afterImpactSpeedMultiplier * this.config.speedY
+      }
 
       // impact increases/decreases the hue
-      increaseHueAfterImpact(hueIncreaseAmountAfterImpactBottom)
+      increaseHueAfterImpact(hueIncreaseAmountAfterImpact)
 
       // impact causes fireflies to shrink/grow
-      changeSizeAfterImpact(sizeMultiplierAfterImpactBottom)
+      changeSizeAfterImpact(sizeMultiplierAfterImpact)
     }
 
-    if (isOnTopEdge && stopAtBoundTop) {
-      this.config.y = topEdge
-      this.config.speedY = -afterImpactSpeedMultiplierTop * this.config.speedY
-      increaseHueAfterImpact(hueIncreaseAmountAfterImpactTop)
-      changeSizeAfterImpact(sizeMultiplierAfterImpactTop)
-    }
+    if (isOnBottomEdge && stopAtBoundBottom)
+      changeConfigAfterImpact(
+        bottomEdge,
+        "y",
+        afterImpactSpeedMultiplierBottom,
+        hueIncreaseAmountAfterImpactBottom,
+        sizeMultiplierAfterImpactBottom
+      )
 
-    if (isOnLeftEdge && stopAtBoundLeft) {
-      this.config.x = leftEdge
-      this.config.speedX = -afterImpactSpeedMultiplierLeft * this.config.speedX
-      increaseHueAfterImpact(hueIncreaseAmountAfterImpactLeft)
-      changeSizeAfterImpact(sizeMultiplierAfterImpactLeft)
-    }
+    if (isOnTopEdge && stopAtBoundTop)
+      changeConfigAfterImpact(
+        topEdge,
+        "y",
+        afterImpactSpeedMultiplierTop,
+        hueIncreaseAmountAfterImpactTop,
+        sizeMultiplierAfterImpactTop
+      )
 
-    if (isOnRightEdge && stopAtBoundRight) {
-      this.config.x = rightEdge
-      this.config.speedX = -afterImpactSpeedMultiplierRight * this.config.speedX
-      increaseHueAfterImpact(hueIncreaseAmountAfterImpactRight)
-      changeSizeAfterImpact(sizeMultiplierAfterImpactRight)
-    }
+    if (isOnLeftEdge && stopAtBoundLeft)
+      changeConfigAfterImpact(
+        leftEdge,
+        "x",
+        afterImpactSpeedMultiplierLeft,
+        hueIncreaseAmountAfterImpactLeft,
+        sizeMultiplierAfterImpactLeft
+      )
+
+    if (isOnRightEdge && stopAtBoundRight)
+      changeConfigAfterImpact(
+        rightEdge,
+        "x",
+        afterImpactSpeedMultiplierRight,
+        hueIncreaseAmountAfterImpactRight,
+        sizeMultiplierAfterImpactRight
+      )
   }
 
-  handleOutOfBoundsPositioning = (method: OutOfBoundsPositioningMethodType) => {
-    const { backFillPosition: outOfBoundsBackFillPosition } =
-      this.appConfig.fireflies.outOfBounds
+  handleOutOfBoundsPositioning = () => {
+    const { size, x, y } = this.config
 
-    const { size } = this.config
-
-    const isOutOfBoundsFromLeft = this.config.x < -size / 2
-    const isOutOfBoundsFromRight =
-      this.config.x > this.canvasSize.width + size / 2
-    const isOutOfBoundsFromTop = this.config.y < -size / 2
-    const isOutOfBoundsFromBottom =
-      this.config.y > this.canvasSize.height + size / 2
+    const isOutOfBoundsFromLeft = x < -size / 2
+    const isOutOfBoundsFromRight = x > this.canvasSize.width + size / 2
+    const isOutOfBoundsFromTop = y < -size / 2
+    const isOutOfBoundsFromBottom = y > this.canvasSize.height + size / 2
 
     const isOutOfBounds =
       isOutOfBoundsFromLeft ||
@@ -839,78 +850,71 @@ class FireFly {
       isOutOfBoundsFromTop ||
       isOutOfBoundsFromBottom
 
-    if (isOutOfBounds && this.appConfig.fireflies.outOfBounds.resetSpeeds) {
-      this.resetSpeeds()
-    }
+    if (isOutOfBounds) {
+      const {
+        backFillPosition: outOfBoundsBackFillPosition,
+        postitioningMethod,
+        resetSpeeds: resetSpeedsIfOutOfBounds,
+        resetRotation: resetRotationIfOutOfBounds
+      } = this.appConfig.fireflies.outOfBounds
 
-    switch (method) {
-      case "forceFade":
-        if (isOutOfBounds) {
+      if (resetSpeedsIfOutOfBounds) this.resetSpeeds()
+      if (resetRotationIfOutOfBounds)
+        this.config.rotationSpeed = this.originalConfig.rotationSpeed
+
+      switch (postitioningMethod) {
+        case "forceFade":
           if (this.config.opacityChangeMode === "fade") this.config.opacity = 0
           else this.config.opacity = 1
-        }
-        break
-      case "continueOnOtherSide":
-        // --  reset the speed after going out of bounds
-        if (isOutOfBoundsFromLeft) {
-          this.config.x = this.canvasSize.width + size / 2
-          return
-        }
-        if (isOutOfBoundsFromRight) {
-          this.config.x = -size / 2
-          return
-        }
-        if (isOutOfBoundsFromTop) {
-          this.config.y = this.canvasSize.height + size / 2
-          return
-        }
-        if (isOutOfBoundsFromBottom) {
-          this.config.y = -size / 2
-          return
-        }
-        break
+          break
+        case "continueOnOtherSide":
+          // --  reset the speed after going out of bounds
+          if (isOutOfBoundsFromLeft) {
+            this.config.x = this.canvasSize.width + size / 2
+          }
+          if (isOutOfBoundsFromRight) {
+            this.config.x = -size / 2
+          }
+          if (isOutOfBoundsFromTop) {
+            this.config.y = this.canvasSize.height + size / 2
+          }
+          if (isOutOfBoundsFromBottom) {
+            this.config.y = -size / 2
+          }
+          break
 
-      case "random":
-        if (isOutOfBounds) {
+        case "random":
           this.config.x = Math.random() * this.canvasSize.width
           this.config.y = Math.random() * this.canvasSize.height
-        }
-        break
+          break
 
-      case "set":
-        if (isOutOfBounds) {
+        case "set":
           this.config.x = outOfBoundsBackFillPosition.x
           this.config.y = outOfBoundsBackFillPosition.y
-        }
-        break
+          break
 
-      case "randomX":
-        if (isOutOfBounds) {
+        case "randomX":
           this.config.x = Math.random() * this.canvasSize.width
           this.config.y = outOfBoundsBackFillPosition.y
-        }
-        break
+          break
 
-      case "randomY":
-        if (isOutOfBounds) {
+        case "randomY":
           this.config.x = outOfBoundsBackFillPosition.x
           this.config.y = Math.random() * this.canvasSize.height
-        }
-        break
+          break
 
-      case "centerOfCanvas":
-        if (isOutOfBounds) {
+        case "centerOfCanvas":
           this.config.x = this.canvasSize.width / 2
           this.config.y = this.canvasSize.height / 2
-        }
-        break
+          break
 
-      case "none":
-        break
+        case "none":
+          break
 
-      default:
-        throw new Error("Unknown OutOfBoundPositioningBehaviors")
-        break
+        default:
+          throw new Error("Unknown OutOfBoundPositioningBehaviors")
+          break
+      }
     }
   }
 
@@ -954,22 +958,23 @@ class FireFly {
   }
 
   update(ctx: CanvasRenderingContext2D, hueShiftAmount: number) {
+    this.draw(ctx, hueShiftAmount)
     this.handleRotation()
     this.handleRotationAcceleration()
+
+    // handle Opacity change
     if (this.config.opacityChangeMode === "fade") this.handleFade()
     else this.handleGlow()
-    this.handleBoundsPositioning()
-    this.handleOutOfBoundsPositioning(
-      this.appConfig.fireflies.outOfBounds.postitioningMethod
-    )
 
     this.handleMove()
     this.handleAcceleration()
     this.handleJitter()
+
+    this.handleBoundsPositioning()
+    this.handleOutOfBoundsPositioning()
+
     if (this.rainbowMode) {
       this.somewhereOverTheRainbow()
     }
-
-    this.draw(ctx, hueShiftAmount)
   }
 }

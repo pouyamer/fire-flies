@@ -69,10 +69,13 @@ const addCanvas = (
   }
 
   let fireflies: FireFly[] = []
+  const wind = new Wind(finalConfig.wind)
 
   // creating fireflies based on finalConfig
   for (let i = 0; i < finalConfig.fireflies.count; i++) {
-    fireflies.push(new FireFly(finalConfig))
+    const newFirefly = new FireFly(finalConfig)
+    wind.affectFirefly(newFirefly, newFirefly.config.x / canvasSize.width)
+    fireflies.push(newFirefly)
   }
 
   // ============== TEST ============*/
@@ -170,7 +173,9 @@ const addCanvas = (
     ctx.fillRect(0, 0, canvasSize.width, canvasSize.height)
 
     // Fireflies
-    fireflies.forEach(firefly => firefly.update(ctx, hueShiftAmount))
+    for (let i = 0; i < fireflies.length; i++) {
+      fireflies[i].update(ctx, hueShiftAmount)
+    }
 
     // requestAnimationFrame causes the browser to call the function again and again
     requestAnimationFrame(render)

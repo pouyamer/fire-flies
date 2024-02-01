@@ -1,7 +1,7 @@
 const movementConfig: MovementConfigType = {
   speedX: {
-    min: 1,
-    max: 5
+    min: 0,
+    max: 0
   },
   speedY: {
     min: 0,
@@ -14,7 +14,7 @@ const movementConfig: MovementConfigType = {
   },
   accelerationY: {
     min: 0,
-    max: 0
+    max: 0.4
   },
   accelerateInCurrentMovingDirection: false,
 

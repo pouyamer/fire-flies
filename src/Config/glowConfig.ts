@@ -1,7 +1,7 @@
 const glowConfig: OpacityChangeConfigType = {
   rate: {
     min: 0.003,
-    max: 0.012
+    max: 0.009
   },
 
   opacityAfterOpacityChange: {
@@ -17,7 +17,7 @@ const glowConfig: OpacityChangeConfigType = {
   resetRateAfterOpacityChange: true,
   resetSizeAfterOpacityChange: false,
   sizeChange: {
-    mode: "grow",
+    mode: "none",
     frequency: 1
   }
 }

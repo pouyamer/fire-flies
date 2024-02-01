@@ -8,12 +8,14 @@ const config: IConfig = {
     l: 0,
     a: 1
   },
+  wind: windConfig,
+
   fireflies: {
-    count: 3000,
+    count: 500,
 
     size: {
-      min: 4,
-      max: 50
+      min: 1,
+      max: 30
     },
 
     movement: movementConfig,

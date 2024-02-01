@@ -3,6 +3,8 @@ interface IConfig {
 
   rainbowMode: boolean // true = rainbow mode, false = normal mode
   skyColor: IHSLColor
+
+  wind: WindConfigType
   fireflies: {
     // Number of fireflies
     count: number

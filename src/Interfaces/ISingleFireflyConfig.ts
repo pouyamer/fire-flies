@@ -35,4 +35,13 @@ interface ISingleFireflyConfig {
   jitterY: number
 
   quarterCircleCenterLocation: TwoDimentionalDirectionType
+
+  // wind properties will be set once wind object is created
+  wind: Wind
+
+  // how much firefly resists wind [0-1]
+  windResistance: number
+
+  // how much firefly is affected by wind [0-1]
+  windAffectStrength: number
 }

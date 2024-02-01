@@ -88,7 +88,10 @@ class FireFly {
       speedY: 0,
       accelerationX: 0,
       accelerationY: 0,
-      quarterCircleCenterLocation: "bottom-left"
+      quarterCircleCenterLocation: "bottom-left",
+      wind: new Wind(windConfig),
+      windResistance: 0,
+      windAffectStrength: 0
     }
 
     this.config = this.initializedConfig
@@ -116,6 +119,8 @@ class FireFly {
         ? this.utilGetRandomNumberBetween({ min: 0, max: Math.PI * 2 })
         : startingAngle
     }
+
+    const fireflySize = this.utilGetRandomNumberBetween(size)
 
     this.config = {
       x: 0,
@@ -156,12 +161,15 @@ class FireFly {
       ),
       opacityChangeMode,
       // size gets randomized based on your config
-      size: this.utilGetRandomNumberBetween(size),
+      size: fireflySize,
       speedX: this.utilGetRandomNumberBetween(speedX),
       speedY: this.utilGetRandomNumberBetween(speedY),
 
       // Where the center of the quarter circle is located
-      quarterCircleCenterLocation: getQuarterCircleCenterLocation()
+      quarterCircleCenterLocation: getQuarterCircleCenterLocation(),
+      wind: new Wind(windConfig),
+      windResistance: 0,
+      windAffectStrength: 0
     }
 
     const { x: startingX, y: startingY } = this.getNewPosition(
@@ -957,6 +965,25 @@ class FireFly {
     this.config.rotationSpeed += this.config.rotationAcceleration
   }
 
+  handleWind = () => {
+    const { wind, windAffectStrength } = this.config
+    if (wind) {
+      this.config.windAffectStrength =
+        wind.windConfig.calculateWindAffectionFunction(
+          wind.config.sourceX,
+          wind.config.sourceY,
+          this.config.x,
+          this.config.y,
+          this.canvasSize.width,
+          this.canvasSize.height
+        )
+      this.config.x +=
+        (windAffectStrength - this.config.windResistance) * wind.config.speedX
+      this.config.y +=
+        (windAffectStrength - this.config.windResistance) * wind.config.speedY
+    }
+  }
+
   update(ctx: CanvasRenderingContext2D, hueShiftAmount: number) {
     this.draw(ctx, hueShiftAmount)
     this.handleRotation()
@@ -965,6 +992,7 @@ class FireFly {
     // handle Opacity change
     if (this.config.opacityChangeMode === "fade") this.handleFade()
     else this.handleGlow()
+    this.handleWind()
 
     this.handleMove()
     this.handleAcceleration()

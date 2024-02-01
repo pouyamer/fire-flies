@@ -1,5 +1,5 @@
 const shapingConfig: ShapingConfigType = {
-  shape: "regularPolygon",
+  shape: "circle",
   regularPolygon: {
     sideCount: {
       min: 3,

@@ -1,6 +1,6 @@
 const boundsConfig: BoundsConfigType = {
   toggleBounds: {
-    top: true,
+    top: false,
     right: false,
     bottom: true,
     left: false
@@ -8,7 +8,7 @@ const boundsConfig: BoundsConfigType = {
   afterImpactSpeedMultiplier: {
     top: 1,
     right: 1,
-    bottom: 1,
+    bottom: 0.75,
     left: 1
   },
   hueIncreaseAmountAfterImpact: {

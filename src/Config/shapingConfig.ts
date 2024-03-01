@@ -3,7 +3,7 @@ const shapingConfig: ShapingConfigType = {
   regularPolygon: {
     sideCount: {
       min: 3,
-      max: 3
+      max: 5
     }
   }
 }

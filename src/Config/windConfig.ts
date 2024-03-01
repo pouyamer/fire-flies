@@ -1,13 +1,13 @@
 const windConfig: WindConfigType = {
   speedX: {
-    min: -10,
-    max: 10
+    min: 0,
+    max: 0
   },
   speedY: {
-    min: -10,
-    max: 10
+    min: 0,
+    max: 0
   },
-  speedResetInterval: 3000,
+  speedResetInterval: Infinity,
   calculateWindAffectionFunction: (
     sourceX: number,
     sourceY: number,

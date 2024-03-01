@@ -1,12 +1,12 @@
 const rotationConfig: RotationConfigType = {
   startingAngle: 0,
   speed: {
-    min: 0.01,
-    max: 0.1
+    min: 0.03,
+    max: 0.03
   },
   acceleration: {
-    min: 0.0001,
-    max: 0.0002
+    min: 0,
+    max: 0
   },
 
   startAngleOnRandom: true

@@ -712,6 +712,24 @@ class FireFly {
         right: sizeMultiplierAfterImpactRight,
         bottom: sizeMultiplierAfterImpactBottom,
         left: sizeMultiplierAfterImpactLeft
+      },
+      rotationSpeedMultiplierAfterImpact: {
+        top: rotationSpeedMultiplierAfterImpactTop,
+        left: rotationSpeedMultiplierAfterImpactLeft,
+        right: rotationSpeedMultiplierAfterImpactRight,
+        bottom: rotationSpeedMultiplierAfterImpactBottom
+      },
+      accelerationXRegenrationAfterImpact: {
+        top: accelerationXRegenrationAfterImpactTop,
+        right: accelerationXRegenrationAfterImpactRight,
+        bottom: accelerationXRegenrationAfterImpactBottom,
+        left: accelerationXRegenrationAfterImpactLeft
+      },
+      accelerationYRegenrationAfterImpact: {
+        top: accelerationYRegenrationAfterImpactTop,
+        right: accelerationYRegenrationAfterImpactRight,
+        bottom: accelerationYRegenrationAfterImpactBottom,
+        left: accelerationYRegenrationAfterImpactLeft
       }
     } = boundsConfig
 
@@ -788,16 +806,27 @@ class FireFly {
       edgeAxis: "x" | "y",
       afterImpactSpeedMultiplier: number,
       hueIncreaseAmountAfterImpact: number,
-      sizeMultiplierAfterImpact: number
+      sizeMultiplierAfterImpact: number,
+      rotationSpeedMultiplierAfterImpact: number,
+      accelerationXRegenrationAfterImpact: boolean,
+      accelerationYRegenrationAfterImpact: boolean
     ) => {
       // ensure the position after the impact
       if (edgeAxis === "x") {
         this.config.x = edge
         this.config.speedX = -afterImpactSpeedMultiplier * this.config.speedX
+        this.config.rotationSpeed *= rotationSpeedMultiplierAfterImpact
+        this.config.accelerationX = this.utilGetRandomNumberBetween(
+          this.appConfig.fireflies.movement.accelerationX
+        )
       }
       if (edgeAxis === "y") {
         this.config.y = edge
         this.config.speedY = -afterImpactSpeedMultiplier * this.config.speedY
+        this.config.rotationSpeed *= rotationSpeedMultiplierAfterImpact
+        this.config.accelerationY = this.utilGetRandomNumberBetween(
+          this.appConfig.fireflies.movement.accelerationY
+        )
       }
 
       // impact increases/decreases the hue
@@ -813,7 +842,10 @@ class FireFly {
         "y",
         afterImpactSpeedMultiplierBottom,
         hueIncreaseAmountAfterImpactBottom,
-        sizeMultiplierAfterImpactBottom
+        sizeMultiplierAfterImpactBottom,
+        rotationSpeedMultiplierAfterImpactBottom,
+        accelerationXRegenrationAfterImpactBottom,
+        accelerationYRegenrationAfterImpactBottom
       )
 
     if (isOnTopEdge && stopAtBoundTop)
@@ -822,7 +854,10 @@ class FireFly {
         "y",
         afterImpactSpeedMultiplierTop,
         hueIncreaseAmountAfterImpactTop,
-        sizeMultiplierAfterImpactTop
+        sizeMultiplierAfterImpactTop,
+        rotationSpeedMultiplierAfterImpactTop,
+        accelerationXRegenrationAfterImpactTop,
+        accelerationYRegenrationAfterImpactTop
       )
 
     if (isOnLeftEdge && stopAtBoundLeft)
@@ -831,7 +866,10 @@ class FireFly {
         "x",
         afterImpactSpeedMultiplierLeft,
         hueIncreaseAmountAfterImpactLeft,
-        sizeMultiplierAfterImpactLeft
+        sizeMultiplierAfterImpactLeft,
+        rotationSpeedMultiplierAfterImpactLeft,
+        accelerationXRegenrationAfterImpactLeft,
+        accelerationYRegenrationAfterImpactLeft
       )
 
     if (isOnRightEdge && stopAtBoundRight)
@@ -840,7 +878,10 @@ class FireFly {
         "x",
         afterImpactSpeedMultiplierRight,
         hueIncreaseAmountAfterImpactRight,
-        sizeMultiplierAfterImpactRight
+        sizeMultiplierAfterImpactRight,
+        rotationSpeedMultiplierAfterImpactRight,
+        accelerationXRegenrationAfterImpactRight,
+        accelerationYRegenrationAfterImpactRight
       )
   }
 

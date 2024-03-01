@@ -1,7 +1,7 @@
 const fadeConfig: OpacityChangeConfigType = {
   rate: {
-    min: 0.001,
-    max: 0.009
+    min: 0,
+    max: 0
   },
 
   // TODO: change this to new opacity after fade (and grow)
@@ -19,7 +19,7 @@ const fadeConfig: OpacityChangeConfigType = {
   resetRateAfterOpacityChange: true,
   resetSizeAfterOpacityChange: true,
   sizeChange: {
-    mode: "grow",
+    mode: "none",
     frequency: 1
   }
 }

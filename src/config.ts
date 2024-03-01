@@ -11,10 +11,10 @@ const config: IConfig = {
   wind: windConfig,
 
   fireflies: {
-    count: 500,
+    count: 5000,
 
     size: {
-      min: 1,
+      min: 5,
       max: 30
     },
 

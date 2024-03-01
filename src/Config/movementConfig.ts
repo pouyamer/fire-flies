@@ -9,12 +9,12 @@ const movementConfig: MovementConfigType = {
   },
 
   accelerationX: {
-    min: 0,
-    max: 0
+    min: -0.05,
+    max: 0.05
   },
   accelerationY: {
-    min: 0,
-    max: 0.4
+    min: -0.05,
+    max: 0.05
   },
   accelerateInCurrentMovingDirection: false,
 

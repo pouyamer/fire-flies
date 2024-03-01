@@ -177,7 +177,10 @@ const addCanvas = (
       fireflies[i].update(ctx, hueShiftAmount)
     }
 
-    // requestAnimationFrame causes the browser to call the function again and again
+    // requestAnimationFrame causes the browser
+    // to call the function once the new frame
+    // is shown
+
     requestAnimationFrame(render)
   }
 

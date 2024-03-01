@@ -1,5 +1,5 @@
 const colorValueConfig: ColorValueConfigType = {
-  updateMode: "updatingLightness",
+  updateMode: "updatingHue",
   startingMehtod: "random",
   onFadeMethod: "random",
   increasingOrDecreasingOnFade: 10,
@@ -12,8 +12,8 @@ const colorValueConfig: ColorValueConfigType = {
 
   singleColorValue: {
     h: 40,
-    s: 85,
-    l: 65,
+    s: 100,
+    l: 55,
     a: 1
   },
 
@@ -34,7 +34,7 @@ const colorValueConfig: ColorValueConfigType = {
 
   hslColorRangeSpecification: {
     h: {
-      min: 330,
+      min: 0,
       max: 360
     },
     s: {

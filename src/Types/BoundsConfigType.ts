@@ -8,8 +8,14 @@ type BoundsConfigType = {
   afterImpactSpeedMultiplier: DirectionalNumberType
   // how much hue increases after it touches the bounds
   hueIncreaseAmountAfterImpact: DirectionalNumberType
+  // how much rotation speed it's going to lose
+  rotationSpeedMultiplierAfterImpact: DirectionalNumberType
 
   sizeMultiplierAfterImpact: DirectionalNumberType
+
+  // if acceleration should be regenrated after impact
+  accelerationXRegenrationAfterImpact: DirectionalBooleanType
+  accelerationYRegenrationAfterImpact: DirectionalBooleanType
 
   changeSizeToMinAfterHitMaxSize: boolean
 }

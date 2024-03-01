@@ -1,5 +1,5 @@
 const opacityChangeOptionsConfig: OpacityChangeOptionsConfigType = {
-  fadeRatio: 0,
+  fadeRatio: 1,
 
   fade: fadeConfig,
   glow: glowConfig

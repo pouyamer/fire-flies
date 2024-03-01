@@ -134,7 +134,7 @@ class FireFly {
       accelerationY: this.utilGetRandomNumberBetween(accelerationY),
       colorValue: this.determineColor(
         firefliesConfig.colorValue.updateMode,
-        firefliesConfig.colorValue.startingMehtod
+        "starting"
       ),
       debugMode: debugMode,
       jitterX: this.utilGetRandomNumberBetween(jitterCoefficientX),
@@ -154,7 +154,7 @@ class FireFly {
           : this.utilGetRandomNumberBetween(sideCount, true),
       opacity: this.determineColor(
         firefliesConfig.colorValue.updateMode,
-        firefliesConfig.colorValue.startingMehtod
+        "starting"
       ).a,
       opacityChangeRate: this.utilGetRandomNumberBetween(
         opacityChangeMode === "fade" ? fadeRate : glowRate
@@ -258,103 +258,110 @@ class FireFly {
 
   determineColor = (
     coloringMode: ColorValueUpdateModeType,
-    determinationMethod: ColorDeterminationMethodType = "random"
+    determiningType: "starting" | "fading" = "starting"
   ): IHSLColor => {
     const { fireflies: firefliesConfig } = this.appConfig
 
     const {
-      increasingOrDecreasingOnFade,
-      singleColorValue,
-      hueRangeSpecification,
-      saturationRangeSpecification,
-      lightnessRangeSpecification
+      incrementOnFade: {
+        h: hueIncrementOnFade,
+        s: saturationIncrementOnFade,
+        l: lightnessIncrementOnFade,
+        a: alphaIncrementOnFade
+      },
+
+      hslColorShouldChangeAfterFade: {
+        h: shouldChangeAfterFadeHue,
+        s: shouldChangeAfterFadeSaturation,
+        l: shouldChangeAfterFadeLightness,
+        a: shouldChangeAfterFadeAlpha
+      },
+
+      hslColorChangeRange: {
+        h: hueChangeRange,
+        s: saturationChangeRange,
+        l: lightnessChangeRange,
+        a: alphaChangeRange
+      },
+      onFadeMethod: {
+        h: hueFadeMethod,
+        s: saturationFadeMethod,
+        l: lightnessFadeMethod,
+        a: alphaFadeMethod
+      },
+      startingMehtod: {
+        h: startingHueMethod,
+        s: startingSaturationMethod,
+        l: startingLightnessMethod,
+        a: startingAlphaMethod
+      }
     } = this.appConfig.fireflies.colorValue
 
+    const hueUpdateMethod =
+      determiningType === "fading" ? hueFadeMethod : startingHueMethod
+    const saturationUpdateMethod =
+      determiningType === "fading"
+        ? saturationFadeMethod
+        : startingSaturationMethod
+    const lightnessUpdateMethod =
+      determiningType === "fading"
+        ? lightnessFadeMethod
+        : startingLightnessMethod
+    const alphaUpdateMethod =
+      determiningType === "fading" ? alphaFadeMethod : startingAlphaMethod
+
     switch (coloringMode) {
-      case "singleColor":
-        return { ...singleColorValue }
-
-      case "updatingHue":
-        return {
-          ...singleColorValue,
-          h: this.getDeterminatedValue(
-            this.config.colorValue.h,
-            hueRangeSpecification,
-            determinationMethod,
-            increasingOrDecreasingOnFade
-          )
-        }
-
-      case "updatingSaturation":
-        return {
-          ...singleColorValue,
-          s: this.getDeterminatedValue(
-            this.config.colorValue.s,
-            saturationRangeSpecification,
-            determinationMethod,
-            increasingOrDecreasingOnFade
-          )
-        }
-
-      case "updatingLightness":
-        return {
-          ...singleColorValue,
-          l: this.getDeterminatedValue(
-            this.config.colorValue.l,
-            lightnessRangeSpecification,
-            determinationMethod,
-            increasingOrDecreasingOnFade
-          )
-        }
-
       case "updatingHslColor":
-        const {
-          h: hueRSpec,
-          s: saturationRSpec,
-          l: lightnessRSpec,
-          a: alphaRSpec
-        } = firefliesConfig.colorValue.hslColorRangeSpecification
-        const {
-          h: hueIncOrDec,
-          s: saturationIncOrDec,
-          l: lightnessIncOrDec,
-          a: alphaIncOrDec
-        } = firefliesConfig.colorValue.increasingOrDecreasingOnFadeAllValues
-
         return {
-          h: this.getDeterminatedValue(
-            this.config.colorValue.h,
-            hueRSpec,
-            determinationMethod,
-            hueIncOrDec
-          ),
-          s: this.getDeterminatedValue(
-            this.config.colorValue.s,
-            saturationRSpec,
-            determinationMethod,
-            saturationIncOrDec
-          ),
-          l: this.getDeterminatedValue(
-            this.config.colorValue.l,
-            lightnessRSpec,
-            determinationMethod,
-            lightnessIncOrDec
-          ),
-          a: this.getDeterminatedValue(
-            this.config.colorValue.a,
-            alphaRSpec,
-            determinationMethod,
-            alphaIncOrDec
-          )
+          h:
+            shouldChangeAfterFadeHue || determiningType === "starting"
+              ? this.getDeterminatedValue(
+                  this.config.colorValue.h,
+                  hueChangeRange,
+                  hueUpdateMethod,
+                  hueIncrementOnFade
+                )
+              : this.config.colorValue.h,
+
+          s:
+            shouldChangeAfterFadeSaturation || determiningType === "starting"
+              ? this.getDeterminatedValue(
+                  this.config.colorValue.s,
+                  saturationChangeRange,
+                  saturationUpdateMethod,
+                  saturationIncrementOnFade
+                )
+              : this.config.colorValue.s,
+
+          l:
+            shouldChangeAfterFadeLightness || determiningType === "starting"
+              ? this.getDeterminatedValue(
+                  this.config.colorValue.l,
+                  lightnessChangeRange,
+                  lightnessUpdateMethod,
+                  lightnessIncrementOnFade
+                )
+              : this.config.colorValue.l,
+
+          a:
+            shouldChangeAfterFadeAlpha || determiningType === "starting"
+              ? this.getDeterminatedValue(
+                  this.config.colorValue.a,
+                  alphaChangeRange,
+                  alphaUpdateMethod,
+                  alphaIncrementOnFade
+                )
+              : this.config.colorValue.a
         }
 
       case "multipleColorValues":
-        const { weightedColorChoices } = firefliesConfig.colorValue
+        const { weightedColorChoices, startingMethodForColorChoices } =
+          firefliesConfig.colorValue
 
         const minIndex = 0
         const maxIndex = weightedColorChoices.length - 1
 
-        if (determinationMethod === "random") {
+        if (startingMethodForColorChoices === "random") {
           let cumulativeWeights = [weightedColorChoices[0].selectionWeight]
           for (let i = 1; i < weightedColorChoices.length; i++) {
             cumulativeWeights[i] =
@@ -375,15 +382,15 @@ class FireFly {
           return { ...weightedColorChoices[i].value }
         }
 
-        if (determinationMethod === "min") {
+        if (startingMethodForColorChoices === "min") {
           return { ...weightedColorChoices[minIndex].value }
         }
-        if (determinationMethod === "max") {
+        if (startingMethodForColorChoices === "max") {
           return { ...weightedColorChoices[maxIndex].value }
         }
         if (
-          determinationMethod === "increasing" ||
-          determinationMethod === "decreasing"
+          startingMethodForColorChoices === "increasing" ||
+          startingMethodForColorChoices === "decreasing"
         ) {
           this.indexForMultipleColorValues = this.getDeterminatedValue(
             this.indexForMultipleColorValues,
@@ -391,7 +398,7 @@ class FireFly {
               min: minIndex,
               max: maxIndex
             },
-            determinationMethod,
+            startingMethodForColorChoices,
             1
           )
 
@@ -643,7 +650,7 @@ class FireFly {
     if (resetColorAfterOpacityChange) {
       this.config.colorValue = this.determineColor(
         this.appConfig.fireflies.colorValue.updateMode,
-        this.appConfig.fireflies.colorValue.onFadeMethod
+        "fading"
       )
     }
 
@@ -679,8 +686,7 @@ class FireFly {
       bounds: boundsConfig,
       colorValue: {
         updateMode: colorValueUpdateMode,
-        hueRangeSpecification: { min: minAllowedHue, max: maxAllowedHue },
-        hslColorRangeSpecification: {
+        hslColorChangeRange: {
           h: { max: maxAllowedHueInHsl, min: minAllowedHueInHsl }
         }
       },
@@ -737,8 +743,6 @@ class FireFly {
 
     const increaseHueAfterImpact = (amount: number) => {
       switch (colorValueUpdateMode) {
-        case "singleColor":
-          return
         case "updatingHslColor":
           this.config.colorValue.h += amount
 
@@ -753,22 +757,6 @@ class FireFly {
           }
           return
 
-        case "updatingHue":
-          this.config.colorValue.h += amount
-
-          if (this.config.colorValue.h > maxAllowedHue) {
-            this.config.colorValue.h = minAllowedHue
-            return
-          }
-
-          if (this.config.colorValue.h < minAllowedHue) {
-            this.config.colorValue.h = maxAllowedHue
-            return
-          }
-          return
-
-        case "updatingSaturation":
-        case "updatingLightness":
         case "multipleColorValues":
           return
       }

@@ -1,38 +1,37 @@
 const colorValueConfig: ColorValueConfigType = {
-  updateMode: "updatingHue",
-  startingMehtod: "random",
-  onFadeMethod: "random",
-  increasingOrDecreasingOnFade: 10,
-  increasingOrDecreasingOnFadeAllValues: {
-    h: 50,
+  updateMode: "updatingHslColor",
+  startingMehtod: {
+    h: "min",
+    s: "min",
+    l: "random",
+    a: "max"
+  },
+  startingMethodForColorChoices: "min",
+  onFadeMethod: {
+    h: "increasing",
+    s: "random",
+    l: "random",
+    a: "random"
+  },
+  incrementOnFade: {
+    h: 10,
     s: 5,
     l: 4,
     a: 0
   },
 
-  singleColorValue: {
-    h: 40,
-    s: 100,
-    l: 55,
-    a: 1
+  // TODO: Later it should be implemented it changes on:
+  // -- Glow
+  // -- OutOfBounds
+  // Also consider moving it to fadeConfig
+  hslColorShouldChangeAfterFade: {
+    h: true,
+    s: false,
+    l: false,
+    a: false
   },
 
-  hueRangeSpecification: {
-    min: 0,
-    max: 360
-  },
-
-  saturationRangeSpecification: {
-    min: 40,
-    max: 90
-  },
-
-  lightnessRangeSpecification: {
-    min: 10,
-    max: 81
-  },
-
-  hslColorRangeSpecification: {
+  hslColorChangeRange: {
     h: {
       min: 0,
       max: 360

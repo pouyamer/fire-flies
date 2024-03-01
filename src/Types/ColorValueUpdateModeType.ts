@@ -1,7 +1,1 @@
-type ColorValueUpdateModeType =
-  | "singleColor"
-  | "updatingHue"
-  | "updatingSaturation"
-  | "updatingLightness"
-  | "updatingHslColor"
-  | "multipleColorValues"
+type ColorValueUpdateModeType = "updatingHslColor" | "multipleColorValues"

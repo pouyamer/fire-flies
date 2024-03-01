@@ -1,49 +1,63 @@
 type ColorValueConfigType = {
+  // Determine how the color value is updated
+  // currently range and color choices are supported
+
   updateMode: ColorValueUpdateModeType
-  // how does the app gets the firefly value
-  // based on the range specification of
-  // different color values (h,s,l,a)
 
   // -- OnStart
-  startingMehtod: ColorRangeSpecificationStartingModeType
+  //    how the app gets different hsl values
+  //    once the app runs
+
+  // -- -- for range:
+  startingMehtod: {
+    h: ColorRangeSpecificationStartingModeType
+    s: ColorRangeSpecificationStartingModeType
+    l: ColorRangeSpecificationStartingModeType
+    a: ColorRangeSpecificationStartingModeType
+  }
+
+  // -- -- for color choices:
+  startingMethodForColorChoices: ColorRangeSpecificationStartingModeType
+
   // -- OnFade
-  onFadeMethod: ColorDeterminationMethodType
-  // on fade,
-  // how much the value gets inc or dec
-  increasingOrDecreasingOnFade: number
+  //    how the app gets different hsl values
+  //    after each time firefly fades
+  onFadeMethod: {
+    h: ColorDeterminationMethodType
+    s: ColorDeterminationMethodType
+    l: ColorDeterminationMethodType
+    a: ColorDeterminationMethodType
+  }
+
   // on fade,
   // when colorValueUpdateMode: randomHslColor
   // how much all the values gets inc or dec
-  increasingOrDecreasingOnFadeAllValues: IHSLColor
+  incrementOnFade: IHSLColor
 
-  // if colorValueUpdateMode = singleColor
-  singleColorValue: IHSLColor
-  // NOTE: for other options,
-  // app gets the rest of the values (h,s,l,a)
-  // from singleColorValue
-  // hue range for if colorValueUpdateMode = randomHue
+  // If firefly should change the hsla value
+  // once it fades
+  hslColorShouldChangeAfterFade: {
+    h: boolean
+    s: boolean
+    l: boolean
+    a: boolean
+  }
 
-  hueRangeSpecification: RangeType
+  // if hslColorShouldChange in any of the
+  // hslValues are true,
+  // at which range should the value change
 
-  // saturation range if colorValueUpdateMode = randomSaturation
-  saturationRangeSpecification: RangeType
-
-  // lightness range if colorValueUpdateMode = randomLightness
-  lightnessRangeSpecification: RangeType
-
-  // if colorValueUpdateMode = randomHslColor
-  hslColorRangeSpecification: {
+  hslColorChangeRange: {
     h: RangeType
     s: RangeType
     l: RangeType
     a: RangeType
   }
 
-  // if colorValueUpdateMode = randomHslColor
-  // an array of selectable colors
-  // selection weights get summed and based on
-  // chance = (selectionWeight / sum)
-  // the color gets selected
+  // -- Weighted Color Choices
+  // if colorValueUpdateMode: multipleColorValues
+  // how the color choices are weighted
+  // for example 2 of yellow and 1 of red
   weightedColorChoices: {
     value: IHSLColor
     selectionWeight: number

@@ -804,17 +804,20 @@ class FireFly {
         this.config.x = edge
         this.config.speedX = -afterImpactSpeedMultiplier * this.config.speedX
         this.config.rotationSpeed *= rotationSpeedMultiplierAfterImpact
-        this.config.accelerationX = this.utilGetRandomNumberBetween(
-          this.appConfig.fireflies.movement.accelerationX
-        )
+
+        if (accelerationXRegenrationAfterImpact)
+          this.config.accelerationX = this.utilGetRandomNumberBetween(
+            this.appConfig.fireflies.movement.accelerationX
+          )
       }
       if (edgeAxis === "y") {
         this.config.y = edge
         this.config.speedY = -afterImpactSpeedMultiplier * this.config.speedY
         this.config.rotationSpeed *= rotationSpeedMultiplierAfterImpact
-        this.config.accelerationY = this.utilGetRandomNumberBetween(
-          this.appConfig.fireflies.movement.accelerationY
-        )
+        if (accelerationYRegenrationAfterImpact)
+          this.config.accelerationY = this.utilGetRandomNumberBetween(
+            this.appConfig.fireflies.movement.accelerationY
+          )
       }
 
       // impact increases/decreases the hue

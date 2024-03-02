@@ -4,13 +4,13 @@ const movementConfig: MovementConfigType = {
     max: 2
   },
   speedY: {
-    min: 0,
-    max: 0
+    min: -3,
+    max: 3
   },
 
   accelerationX: {
-    min: 0,
-    max: 0.01
+    min: -0.02,
+    max: 0.02
   },
   accelerationY: {
     min: -0.006,
@@ -19,11 +19,11 @@ const movementConfig: MovementConfigType = {
   accelerateInCurrentMovingDirection: false,
 
   jitterCoefficientX: {
-    min: 0,
-    max: 0
+    min: -2,
+    max: 2
   },
   jitterCoefficientY: {
-    min: 0,
-    max: 0
+    min: -2,
+    max: 2
   }
 }

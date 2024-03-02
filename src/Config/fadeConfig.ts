@@ -1,13 +1,13 @@
 const fadeConfig: OpacityChangeConfigType = {
   rate: {
-    min: 0.0,
-    max: 0.01
+    min: 0.003,
+    max: 0.006
   },
 
   // TODO: change this to new opacity after fade (and grow)
   // TODO: Refactor the code
   opacityAfterOpacityChange: {
-    min: 0.5,
+    min: 0,
     max: 1
   },
   backFillPosition: {

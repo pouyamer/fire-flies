@@ -5,17 +5,17 @@ const config: IConfig = {
   skyColor: {
     h: 20,
     s: 0,
-    l: 20,
+    l: 0,
     a: 1
   },
   iterationsPerFrame: 3,
   wind: windConfig,
 
   fireflies: {
-    count: 1200,
+    count: 500,
 
     size: {
-      min: 5,
+      min: 10,
       max: 12
     },
 

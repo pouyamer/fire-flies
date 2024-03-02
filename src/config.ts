@@ -4,18 +4,19 @@ const config: IConfig = {
   rainbowMode: false,
   skyColor: {
     h: 20,
-    s: 75,
-    l: 0,
+    s: 0,
+    l: 20,
     a: 1
   },
+  iterationsPerFrame: 3,
   wind: windConfig,
 
   fireflies: {
-    count: 3000,
+    count: 1200,
 
     size: {
       min: 5,
-      max: 40
+      max: 12
     },
 
     movement: movementConfig,

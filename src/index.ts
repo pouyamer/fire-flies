@@ -33,7 +33,7 @@ const addCanvas = (
   desiredConfig = {}
 ) => {
   const finalConfig: IConfig = deepMerge(config, desiredConfig)
-  const { canvasSize } = finalConfig
+  const { canvasSize, iterationsPerFrame } = finalConfig
 
   const firefliesCanvas = createCanvasElement()
   const ctx = firefliesCanvas.getContext("2d") as CanvasRenderingContext2D
@@ -173,8 +173,10 @@ const addCanvas = (
     ctx.fillRect(0, 0, canvasSize.width, canvasSize.height)
 
     // Fireflies
-    for (let i = 0; i < fireflies.length; i++) {
-      fireflies[i].update(ctx, hueShiftAmount)
+    for (let iterations = 0; iterations < iterationsPerFrame; iterations++) {
+      for (let i = 0; i < fireflies.length; i++) {
+        fireflies[i].update(ctx, hueShiftAmount)
+      }
     }
 
     // requestAnimationFrame causes the browser

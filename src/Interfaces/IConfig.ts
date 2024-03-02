@@ -4,13 +4,18 @@ interface IConfig {
   rainbowMode: boolean // true = rainbow mode, false = normal mode
   skyColor: IHSLColor
 
+  // how many times it renders per frame
+  iterationsPerFrame: number
+
   wind: WindConfigType
+
   fireflies: {
     // Number of fireflies
     count: number
 
     // Size Range of butterflies
     size: RangeType
+
     movement: MovementConfigType
     /* ===== Rotation ===== */
     rotation: RotationConfigType

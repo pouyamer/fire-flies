@@ -27,6 +27,7 @@ class FireFly {
     this.canvasSize = this.appConfig.canvasSize
     this.rainbowMode = this.appConfig.rainbowMode
 
+    const { iterationsPerFrame } = appConfig
     // getting range values
     const firefliesConfig = appConfig.fireflies
     const {
@@ -127,18 +128,27 @@ class FireFly {
       y: 0,
       // this will change in config later
       angle: getStartingAngle(),
-      rotationSpeed: this.utilGetRandomNumberBetween(rotationSpeed),
+      rotationSpeed:
+        this.utilGetRandomNumberBetween(rotationSpeed) / iterationsPerFrame,
       rotationAcceleration:
-        this.utilGetRandomNumberBetween(rotationAcceleration),
-      accelerationX: this.utilGetRandomNumberBetween(accelerationX),
-      accelerationY: this.utilGetRandomNumberBetween(accelerationY),
+        this.utilGetRandomNumberBetween(rotationAcceleration) /
+        iterationsPerFrame,
+      accelerationX:
+        this.utilGetRandomNumberBetween(accelerationX) / iterationsPerFrame,
+
+      accelerationY:
+        this.utilGetRandomNumberBetween(accelerationY) / iterationsPerFrame,
       colorValue: this.determineColor(
         firefliesConfig.colorValue.updateMode,
         "starting"
       ),
       debugMode: debugMode,
-      jitterX: this.utilGetRandomNumberBetween(jitterCoefficientX),
-      jitterY: this.utilGetRandomNumberBetween(jitterCoefficientY),
+      jitterX:
+        this.utilGetRandomNumberBetween(jitterCoefficientX) /
+        iterationsPerFrame,
+      jitterY:
+        this.utilGetRandomNumberBetween(jitterCoefficientY) /
+        iterationsPerFrame,
       sizeBehaviourWhenFading:
         Math.random() < fadeSizeChangeConfig.frequency
           ? fadeSizeChangeConfig.mode
@@ -156,14 +166,15 @@ class FireFly {
         firefliesConfig.colorValue.updateMode,
         "starting"
       ).a,
-      opacityChangeRate: this.utilGetRandomNumberBetween(
-        opacityChangeMode === "fade" ? fadeRate : glowRate
-      ),
+      opacityChangeRate:
+        this.utilGetRandomNumberBetween(
+          opacityChangeMode === "fade" ? fadeRate : glowRate
+        ) / iterationsPerFrame,
       opacityChangeMode,
       // size gets randomized based on your config
       size: fireflySize,
-      speedX: this.utilGetRandomNumberBetween(speedX),
-      speedY: this.utilGetRandomNumberBetween(speedY),
+      speedX: this.utilGetRandomNumberBetween(speedX) / iterationsPerFrame,
+      speedY: this.utilGetRandomNumberBetween(speedY) / iterationsPerFrame,
 
       // Where the center of the quarter circle is located
       quarterCircleCenterLocation: getQuarterCircleCenterLocation(),
@@ -620,6 +631,7 @@ class FireFly {
   resetConfigAfterOpacityChange = (
     opacityChangeMode: OpacityChangeModeType
   ) => {
+    const { iterationsPerFrame } = this.appConfig
     const { fade: fadeConfig, glow: glowConfig } =
       this.appConfig.fireflies.opacityChangeOptions
 
@@ -638,9 +650,9 @@ class FireFly {
     this.resetSpeeds()
 
     if (resetRateAfterOpacityChange) {
-      this.config.opacityChangeRate = this.utilGetRandomNumberBetween(
-        opacityChangeConfig.rate
-      )
+      this.config.opacityChangeRate =
+        this.utilGetRandomNumberBetween(opacityChangeConfig.rate) /
+        iterationsPerFrame
     }
 
     if (resetSizeAfterOpacityChange) {
@@ -667,21 +679,28 @@ class FireFly {
       ? this.utilGetRandomNumberBetween(opacityAfterOpacityChange)
       : this.originalConfig.opacity
 
-    this.config.accelerationX = this.utilGetRandomNumberBetween(
-      this.appConfig.fireflies.movement.accelerationX
-    )
-    this.config.accelerationY = this.utilGetRandomNumberBetween(
-      this.appConfig.fireflies.movement.accelerationY
-    )
+    this.config.accelerationX =
+      this.utilGetRandomNumberBetween(
+        this.appConfig.fireflies.movement.accelerationX
+      ) / iterationsPerFrame
 
-    this.config.rotationSpeed = this.originalConfig.rotationSpeed
+    this.config.accelerationY =
+      this.utilGetRandomNumberBetween(
+        this.appConfig.fireflies.movement.accelerationY
+      ) / iterationsPerFrame
+
+    this.config.rotationSpeed =
+      this.originalConfig.rotationSpeed / iterationsPerFrame
   }
 
   somewhereOverTheRainbow = () => {
-    this.config.colorValue.h += Math.random() * 3
+    this.config.colorValue.h +=
+      (Math.random() * 3) / this.appConfig.iterationsPerFrame
   }
 
   handleBoundsPositioning = () => {
+    const { iterationsPerFrame } = this.appConfig
+
     const {
       bounds: boundsConfig,
       colorValue: {
@@ -744,7 +763,7 @@ class FireFly {
     const increaseHueAfterImpact = (amount: number) => {
       switch (colorValueUpdateMode) {
         case "updatingHslColor":
-          this.config.colorValue.h += amount
+          this.config.colorValue.h += amount / iterationsPerFrame
 
           if (this.config.colorValue.h > maxAllowedHueInHsl) {
             this.config.colorValue.h = minAllowedHueInHsl
@@ -802,23 +821,30 @@ class FireFly {
       // ensure the position after the impact
       if (edgeAxis === "x") {
         this.config.x = edge
-        this.config.speedX = -afterImpactSpeedMultiplier * this.config.speedX
-        this.config.rotationSpeed *= rotationSpeedMultiplierAfterImpact
+
+        this.config.speedX =
+          (afterImpactSpeedMultiplier * this.config.speedX) / iterationsPerFrame
 
         if (accelerationXRegenrationAfterImpact)
-          this.config.accelerationX = this.utilGetRandomNumberBetween(
-            this.appConfig.fireflies.movement.accelerationX
-          )
+          this.config.accelerationX =
+            this.utilGetRandomNumberBetween(
+              this.appConfig.fireflies.movement.accelerationX
+            ) / iterationsPerFrame
       }
       if (edgeAxis === "y") {
         this.config.y = edge
-        this.config.speedY = -afterImpactSpeedMultiplier * this.config.speedY
-        this.config.rotationSpeed *= rotationSpeedMultiplierAfterImpact
+        this.config.speedY =
+          (afterImpactSpeedMultiplier * this.config.speedY) / iterationsPerFrame
+
         if (accelerationYRegenrationAfterImpact)
-          this.config.accelerationY = this.utilGetRandomNumberBetween(
-            this.appConfig.fireflies.movement.accelerationY
-          )
+          this.config.accelerationY =
+            this.utilGetRandomNumberBetween(
+              this.appConfig.fireflies.movement.accelerationY
+            ) / iterationsPerFrame
       }
+
+      this.config.rotationSpeed =
+        this.config.rotationSpeed * rotationSpeedMultiplierAfterImpact
 
       // impact increases/decreases the hue
       increaseHueAfterImpact(hueIncreaseAmountAfterImpact)
@@ -1024,7 +1050,8 @@ class FireFly {
     // handle Opacity change
     if (this.config.opacityChangeMode === "fade") this.handleFade()
     else this.handleGlow()
-    this.handleWind()
+
+    // this.handleWind()
 
     this.handleMove()
     this.handleAcceleration()

@@ -1,7 +1,7 @@
 const movementConfig: MovementConfigType = {
   speedX: {
-    min: 0,
-    max: 0
+    min: -2,
+    max: 2
   },
   speedY: {
     min: 0,
@@ -9,21 +9,21 @@ const movementConfig: MovementConfigType = {
   },
 
   accelerationX: {
-    min: -0.02,
-    max: 0.02
+    min: 0,
+    max: 0.01
   },
   accelerationY: {
-    min: -0.02,
-    max: 0.02
+    min: -0.006,
+    max: 0.006
   },
   accelerateInCurrentMovingDirection: false,
 
   jitterCoefficientX: {
-    min: -2,
-    max: 2
+    min: 0,
+    max: 0
   },
   jitterCoefficientY: {
-    min: -2,
-    max: 2
+    min: 0,
+    max: 0
   }
 }

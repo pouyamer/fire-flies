@@ -2,7 +2,7 @@ const shapingConfig: ShapingConfigType = {
   shape: "circle",
   regularPolygon: {
     sideCount: {
-      min: 3,
+      min: 5,
       max: 5
     }
   }

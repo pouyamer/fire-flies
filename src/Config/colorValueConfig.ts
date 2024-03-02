@@ -2,13 +2,13 @@ const colorValueConfig: ColorValueConfigType = {
   updateMode: "updatingHslColor",
   startingMehtod: {
     h: "random",
-    s: "max",
-    l: "random",
+    s: "min",
+    l: "max",
     a: "max"
   },
   startingMethodForColorChoices: "min",
   onFadeMethod: {
-    h: "increasing",
+    h: "random",
     s: "random",
     l: "random",
     a: "random"
@@ -33,16 +33,16 @@ const colorValueConfig: ColorValueConfigType = {
 
   hslColorChangeRange: {
     h: {
-      min: 0,
-      max: 360
+      min: 60,
+      max: 80
     },
     s: {
-      min: 65,
-      max: 100
+      min: 0,
+      max: 90
     },
     l: {
-      min: 50,
-      max: 75
+      min: 20,
+      max: 100
     },
     a: {
       min: 1,

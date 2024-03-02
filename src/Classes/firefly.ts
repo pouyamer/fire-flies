@@ -823,7 +823,8 @@ class FireFly {
         this.config.x = edge
 
         this.config.speedX =
-          (afterImpactSpeedMultiplier * this.config.speedX) / iterationsPerFrame
+          (-afterImpactSpeedMultiplier * this.config.speedX) /
+          iterationsPerFrame
 
         if (accelerationXRegenrationAfterImpact)
           this.config.accelerationX =
@@ -834,7 +835,8 @@ class FireFly {
       if (edgeAxis === "y") {
         this.config.y = edge
         this.config.speedY =
-          (afterImpactSpeedMultiplier * this.config.speedY) / iterationsPerFrame
+          -(afterImpactSpeedMultiplier * this.config.speedY) /
+          iterationsPerFrame
 
         if (accelerationYRegenrationAfterImpact)
           this.config.accelerationY =

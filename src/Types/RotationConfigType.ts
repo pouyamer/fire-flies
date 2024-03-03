@@ -1,11 +1,12 @@
+// rotation is when fireflies rotate (does not affect the circle shape)
 type RotationConfigType = {
-  //  starting Angle
+  //  starting Angle that fireflies are spawned with (in radian)
   startingAngle: number
-  //  if true, starting angle will be randomized
-  //  ignores startingAngle
+  //  if true, starting angle will be randomized at the start of the app
+  //  (Note: this setting ignores the set value of startingAngle)
   startAngleOnRandom: boolean
-  //  rate (radian) of rotation per frame
+  //  rate of rotation (in radian) per iteration
   speed: RangeType
-  //  rate of rotation speed change
+  //  rate in which the rotation speed changes per iteration (in radian)
   acceleration: RangeType
 }

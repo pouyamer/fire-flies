@@ -1,7 +1,6 @@
 type ColorValueConfigType = {
   // Determine how the color value is updated
   // currently range and color choices are supported
-
   updateMode: ColorValueUpdateModeType
 
   // -- OnStart
@@ -32,7 +31,7 @@ type ColorValueConfigType = {
   // on fade,
   // when colorValueUpdateMode: randomHslColor
   // how much all the values gets inc or dec
-  incrementOnFade: IHSLColor
+  incrementOnFade: HslColorType
 
   // If firefly should change the hsla value
   // once it fades
@@ -59,7 +58,7 @@ type ColorValueConfigType = {
   // how the color choices are weighted
   // for example 2 of yellow and 1 of red
   weightedColorChoices: {
-    value: IHSLColor
+    value: HslColorType
     selectionWeight: number
   }[]
 }

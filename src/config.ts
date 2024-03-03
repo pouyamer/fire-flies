@@ -1,4 +1,9 @@
-const config: IConfig = {
+/* To see the documentation for config file 
+   and to better understand it go and read the
+   ConfigType.ts file
+   and each file, see its respective type
+*/
+const config: ConfigType = {
   canvasSize: { width: innerWidth, height: innerHeight },
 
   rainbowMode: false,

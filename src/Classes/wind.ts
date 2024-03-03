@@ -52,6 +52,6 @@ class Wind {
       this.config.speedY = this.utilGetRandomNumberBetween(
         this.windConfig.speedY
       )
-    }, this.windConfig.speedResetInterval)
+    }, this.windConfig.resetInterval)
   }
 }

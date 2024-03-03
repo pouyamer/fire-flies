@@ -1,6 +1,6 @@
 class FireFly {
   canvasSize: { width: number; height: number }
-  appConfig: IConfig
+  appConfig: ConfigType
   config: ISingleFireflyConfig
   originalConfig: ISingleFireflyConfig
   rainbowMode: boolean
@@ -20,7 +20,7 @@ class FireFly {
       : Math.random() * (max - min) + min
   }
 
-  constructor(appConfig: IConfig, debugMode: boolean = false) {
+  constructor(appConfig: ConfigType, debugMode: boolean = false) {
     this.appConfig = appConfig
     this.indexForMultipleColorValues = 0
 
@@ -270,7 +270,7 @@ class FireFly {
   determineColor = (
     coloringMode: ColorValueUpdateModeType,
     determiningType: "starting" | "fading" = "starting"
-  ): IHSLColor => {
+  ): HslColorType => {
     const { fireflies: firefliesConfig } = this.appConfig
 
     const {

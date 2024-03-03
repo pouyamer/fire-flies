@@ -32,7 +32,7 @@ const addCanvas = (
   positionedInElement = true,
   desiredConfig = {}
 ) => {
-  const finalConfig: IConfig = deepMerge(config, desiredConfig)
+  const finalConfig: ConfigType = deepMerge(config, desiredConfig)
   const { canvasSize, iterationsPerFrame } = finalConfig
 
   const firefliesCanvas = createCanvasElement()
@@ -69,12 +69,12 @@ const addCanvas = (
   }
 
   let fireflies: FireFly[] = []
-  const wind = new Wind(finalConfig.wind)
+  // const wind = new Wind(finalConfig.wind)
 
   // creating fireflies based on finalConfig
   for (let i = 0; i < finalConfig.fireflies.count; i++) {
     const newFirefly = new FireFly(finalConfig)
-    wind.affectFirefly(newFirefly, newFirefly.config.x / canvasSize.width)
+    // wind.affectFirefly(newFirefly, newFirefly.config.x / canvasSize.width)
     fireflies.push(newFirefly)
   }
 

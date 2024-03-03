@@ -7,7 +7,7 @@ const windConfig: WindConfigType = {
     min: 0,
     max: 0
   },
-  speedResetInterval: Infinity,
+  resetInterval: Infinity,
   calculateWindAffectionFunction: (
     sourceX: number,
     sourceY: number,

@@ -1,4 +1,7 @@
 # Fireflies
+
+[screen-capture.webm](https://github.com/pouyamer/fire-flies/assets/20505286/18ace8f6-7938-4824-81b1-a5faea98438e)
+
 A beautiful fireflies simulation made using Canvas API.
 
 Lovely Fireflies that flicker in the sky.

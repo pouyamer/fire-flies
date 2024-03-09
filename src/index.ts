@@ -32,6 +32,7 @@ const addCanvas = (
   positionedInElement = true,
   desiredConfig = {}
 ) => {
+  let simulationStopped = false
   const finalConfig: ConfigType = deepMerge(config, desiredConfig)
   const { canvasSize, iterationsPerFrame } = finalConfig
 
@@ -90,19 +91,6 @@ const addCanvas = (
   // =============== END TEST =============== */
 
   // get the sizes right, when window gets resized:
-
-  window.addEventListener("resize", () => {
-    // setting canvas width and height to those of parentElement's
-    finalConfig.canvasSize.width = parseInt(
-      getComputedStyle(parentElement).width.split("px")[0]
-    )
-    finalConfig.canvasSize.height = parseInt(
-      getComputedStyle(parentElement).height.split("px")[0]
-    )
-    // -- Reiniatiating the canvas
-    firefliesCanvas.width = canvasSize.width
-    firefliesCanvas.height = canvasSize.height
-  })
 
   const { hueShiftMode } = finalConfig.fireflies
 
@@ -183,9 +171,33 @@ const addCanvas = (
     // to call the function once the new frame
     // is shown
 
-    requestAnimationFrame(render)
+    !simulationStopped && requestAnimationFrame(render)
   }
 
   // render
   render()
+
+  window.addEventListener("click", () => {
+    simulationStopped = !simulationStopped
+    render()
+  })
+
+  window.addEventListener("resize", () => {
+    // resume the simulation if paused
+    if (simulationStopped) {
+      simulationStopped = false
+      render()
+    }
+
+    // setting canvas width and height to those of parentElement's
+    finalConfig.canvasSize.width = parseInt(
+      getComputedStyle(parentElement).width.split("px")[0]
+    )
+    finalConfig.canvasSize.height = parseInt(
+      getComputedStyle(parentElement).height.split("px")[0]
+    )
+    // -- Reiniatiating the canvas
+    firefliesCanvas.width = canvasSize.width
+    firefliesCanvas.height = canvasSize.height
+  })
 }

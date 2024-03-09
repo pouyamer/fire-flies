@@ -12,3 +12,5 @@ type StartingPositioningMethodType =
   | "set"
   // Fireflies spawn at the center of canvas
   | "centerOfCanvas"
+  // Fireflies spawn at the same location that it faded
+  | "none"

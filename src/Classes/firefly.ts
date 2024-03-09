@@ -262,6 +262,12 @@ class FireFly {
       case "set":
         return backFillPosition
 
+      case "none":
+        return {
+          x: this.config.x,
+          y: this.config.y
+        }
+
       default:
         throw new Error("Unknown FadePositioningBehaviour")
     }

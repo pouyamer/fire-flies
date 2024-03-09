@@ -17,11 +17,11 @@ const config: ConfigType = {
   wind: windConfig,
 
   fireflies: {
-    count: 500,
+    count: 1000,
 
     size: {
       min: 10,
-      max: 12
+      max: 30
     },
 
     movement: movementConfig,

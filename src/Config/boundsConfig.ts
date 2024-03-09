@@ -1,9 +1,9 @@
 const boundsConfig: BoundsConfigType = {
   toggleBounds: {
-    top: false,
-    right: false,
-    bottom: false,
-    left: false
+    top: true,
+    right: true,
+    bottom: true,
+    left: true
   },
   afterImpactSpeedMultiplier: {
     top: 1,
